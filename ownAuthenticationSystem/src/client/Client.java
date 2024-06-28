@@ -7,7 +7,8 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 public class Client {
-    private static final String SERVER_ADDRESS = "localhost";
+   private static final String SERVER_ADDRESS = "localhost";
+
     private static final int SERVER_PORT = 12345;
 
     public static void main(String[] args) {
@@ -24,6 +25,7 @@ public class Client {
             out.println("LOGIN " + username + " " + password);
             String response = in.readLine();
             System.out.println("Server reply: " + response);
+
 
             if ("LOGIN SUCCESSFUL".equals(response)) {
                 String roleId = in.readLine();

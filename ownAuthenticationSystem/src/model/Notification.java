@@ -1,14 +1,21 @@
 package model;
 
+import java.util.Date;
+
 public class Notification {
     private long notificationId;
     private String message;
-    private String date;
+    private Date date;
 
-    public Notification(long notificationId, String message, String date) {
+    public Notification(long notificationId, String message, Date date) {
         this.notificationId = notificationId;
         this.message = message;
         this.date = date;
+    }
+
+    public Notification(String message) {
+        this.message = message;
+
     }
 
     // Getters and Setters
@@ -28,11 +35,11 @@ public class Notification {
         this.message = message;
     }
 
-    public String getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 }

@@ -44,11 +44,13 @@ public class FeedbackDAO {
                 String comment = resultSet.getString("comment");
                 String date = resultSet.getString("date");
 
-                feedbacks.add(new Feedback( menuItemId, userId, comment, rating,date));
+                feedbacks.add(new Feedback( feedbackId,menuItemId, userId, comment, rating,date));
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return feedbacks;
     }
+
+
 }

@@ -5,31 +5,38 @@ import java.util.regex.Pattern;
 
 public class SentimentAnalysisService {
 
-    // Method to perform sentiment analysis and return sentiment score
     public double analyzeSentiment(String comment) {
-        // Normalize the comment text
         comment = comment.toLowerCase().trim();
 
-        // Define positive and negative keywords
-        String[] positiveKeywords = {"good", "great", "excellent", "awesome", "fantastic"};
-        String[] negativeKeywords = {"bad", "poor", "terrible", "horrible", "awful"};
+        String[] positiveKeywords = {
+                "good", "great", "excellent", "awesome", "fantastic",
+                "delicious", "tasty", "yummy", "scrumptious", "savory",
+                "mouthwatering", "delectable", "flavorful", "succulent", "appetizing",
+                "fresh", "satisfying", "juicy", "tender", "perfect",
+                "heavenly", "divine", "exquisite", "superb", "lovely"
+        };
 
-        // Calculate sentiment score based on keyword matches
+        String[] negativeKeywords = {
+                "bad", "poor", "terrible", "horrible", "awful",
+                "bland", "stale", "overcooked", "undercooked", "tasteless",
+                "greasy", "salty", "burnt", "dry", "rubbery",
+                "unappetizing", "disgusting", "soggy", "inedible", "flavorless",
+                "spoiled", "rotten", "bitter", "chewy", "tough"
+        };
+
         int positiveMatches = countKeywordMatches(comment, positiveKeywords);
         int negativeMatches = countKeywordMatches(comment, negativeKeywords);
 
-        // Determine sentiment score based on matches
         double sentimentScore = 0.0;
         if (positiveMatches > negativeMatches) {
-            sentimentScore = 1.0; // Positive sentiment
+            sentimentScore = 1.0;
         } else if (negativeMatches > positiveMatches) {
-            sentimentScore = -1.0; // Negative sentiment
+            sentimentScore = -1.0;
         }
 
         return sentimentScore;
     }
 
-    // Method to count occurrences of keywords in a comment
     private int countKeywordMatches(String comment, String[] keywords) {
         int count = 0;
         for (String keyword : keywords) {
@@ -42,4 +49,3 @@ public class SentimentAnalysisService {
         return count;
     }
 }
-

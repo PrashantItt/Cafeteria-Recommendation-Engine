@@ -15,6 +15,9 @@ public class ChefRecomendationFood {
         this.foodItemId = foodItemId;
         this.foodtypeId = foodtypeId;
     }
+    public ChefRecomendationFood(long foodItemId) {
+        this.foodItemId = foodItemId;
+    }
 
     // Getters and setters
     public long getId() {

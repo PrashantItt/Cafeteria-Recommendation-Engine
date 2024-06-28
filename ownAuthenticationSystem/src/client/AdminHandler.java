@@ -2,7 +2,6 @@ package client;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
@@ -71,6 +70,9 @@ public class AdminHandler implements RoleHandler {
             case 7:
                 viewMenu();
                 break;
+            case 8:
+                viewDiscardMenu();
+                break;
             default:
                 System.out.println("Invalid choice. Please try again.");
                 break;
@@ -85,7 +87,7 @@ public class AdminHandler implements RoleHandler {
         System.out.println("Enter the RoleID");
         Long roleId = scanner.nextLong();
 
-        out.println("ADD_USER " + username + " " + password + " " + roleId);
+        out.println("ADMIN_ADD_USER " + username + " " + password + " " + roleId);
         try {
             String response = in.readLine();
             System.out.println("Server reply: " + response);
@@ -103,7 +105,7 @@ public class AdminHandler implements RoleHandler {
         Long newRoleId = scanner.nextLong();
         scanner.nextLine(); // Consume newline
 
-        out.println("UPDATE_USER " + username + " " + newPassword + " " + newRoleId);
+        out.println("ADMIN_UPDATE_USER " + username + " " + newPassword + " " + newRoleId);
         try {
             String response = in.readLine();
             System.out.println("Server reply: " + response);
@@ -116,7 +118,7 @@ public class AdminHandler implements RoleHandler {
         System.out.print("Enter the username of the user to delete: ");
         String username = scanner.nextLine();
 
-        out.println("DELETE_USER " + username);
+        out.println("ADMIN_DELETE_USER " + username);
         try {
             String response = in.readLine();
             System.out.println("Server reply: " + response);
@@ -130,15 +132,15 @@ public class AdminHandler implements RoleHandler {
         String itemName = scanner.nextLine();
         System.out.print("Enter item price: ");
         double price = scanner.nextDouble();
-        scanner.nextLine(); // Consume newline
+        scanner.nextLine();
         System.out.print("Enter availability status (true/false): ");
         boolean availabilityStatus = scanner.nextBoolean();
-        scanner.nextLine(); // Consume newline
+        scanner.nextLine();
         System.out.print("Enter food item type ID: ");
         long foodItemTypeId = scanner.nextLong();
-        scanner.nextLine(); // Consume newline
+        scanner.nextLine();
 
-        out.println("ADD_MENU_ITEM " + itemName + " " + price + " " + availabilityStatus + " " + foodItemTypeId);
+        out.println("ADMIN_ADD_MENU_ITEM " + itemName + " " + price + " " + availabilityStatus + " " + foodItemTypeId);
         try {
             String response = in.readLine();
             System.out.println("Server reply: " + response);
@@ -163,7 +165,7 @@ public class AdminHandler implements RoleHandler {
         long foodItemTypeId = scanner.nextLong();
         scanner.nextLine();
 
-        out.println("UPDATE_MENU_ITEM " + foodItemId + " " + itemName + " " + price + " " + availabilityStatus + " " + foodItemTypeId);
+        out.println("ADMIN_UPDATE_MENU_ITEM " + foodItemId + " " + itemName + " " + price + " " + availabilityStatus + " " + foodItemTypeId);
         try {
             String response = in.readLine();
             System.out.println("Server reply: " + response);
@@ -177,7 +179,7 @@ public class AdminHandler implements RoleHandler {
         long foodItemId = scanner.nextLong();
         scanner.nextLine(); // Consume newline
 
-        out.println("DELETE_MENU_ITEM " + foodItemId);
+        out.println("ADMIN_DELETE_MENU_ITEM " + foodItemId);
         try {
             String response = in.readLine();
             System.out.println("Server reply: " + response);
@@ -187,7 +189,7 @@ public class AdminHandler implements RoleHandler {
     }
 
     private void viewMenu() {
-        out.println("VIEW_MENU");
+        out.println("COMMON_VIEW_MENU");
         try {
             String response;
             while ((response = in.readLine()) != null) {
@@ -199,6 +201,10 @@ public class AdminHandler implements RoleHandler {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void viewDiscardMenu() {
+
     }
 
     private void viewDailyReviewComments() {

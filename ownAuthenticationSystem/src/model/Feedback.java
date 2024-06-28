@@ -18,6 +18,14 @@ public class Feedback {
         this.userId = userId;
         this.date = date;
     }
+    public Feedback( long id, long menuItemId,long userId, String comment, int rating, String date) {
+        this.id = id;
+        this.menuItemId = menuItemId;
+        this.comment = comment;
+        this.rating = rating;
+        this.userId = userId;
+        this.date = date;
+    }
 
     public long getId() {
         return id;
@@ -78,5 +86,7 @@ public class Feedback {
                 ", date=" + date +
                 '}';
     }
+
+
 }
 

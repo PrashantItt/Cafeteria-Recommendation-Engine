@@ -21,21 +21,3 @@ public class RoleHandlerFactory {
     }
 }
 
-/*
-public class RoleHandlerFactory {
-    private static final Map<Role, RoleHandler> handlers = new HashMap<>();
-
-    static {
-        handlers.put(Role.ADMIN, new AdminHandler());
-        handlers.put(Role.CHEF, new ChefHandler());
-        handlers.put(Role.EMPLOYEE, new EmployeeHandler());
-    }
-
-    public static RoleHandler getHandler(Role role) {
-        if (!handlers.containsKey(role)) {
-            throw new IllegalArgumentException("Invalid role: " + role);
-        }
-        return handlers.get(role);
-    }
-}
- */

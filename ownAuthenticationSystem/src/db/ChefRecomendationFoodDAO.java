@@ -10,17 +10,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import model.ChefRecomendationFood;
+import model.FoodItem;
 
 public class ChefRecomendationFoodDAO {
 
     public boolean insert(ChefRecomendationFood recommendation) {
-        String sql = "INSERT INTO chefRecomendationFood (foodItemId, foodtypeId, Date) VALUES (?, ?, CURDATE())";
+        String sql = "INSERT INTO chefRecomendationFood (foodItemId, Date) VALUES (?, CURDATE())";
         try (
                 Connection connection = Database.getConnection();
                 PreparedStatement stmt = connection.prepareStatement(sql)
         ) {
             stmt.setLong(1, recommendation.getFoodItemId());
-            stmt.setLong(2, recommendation.getFoodtypeId());
+           // stmt.setLong(2, recommendation.getFoodtypeId());
             int affectedRows = stmt.executeUpdate();
             return affectedRows == 1;
         } catch (SQLException e) {
@@ -55,7 +56,7 @@ public class ChefRecomendationFoodDAO {
     }
 
     // Method to retrieve recommendations for today's date
-    public List<ChefRecomendationFood> getTommorowMenu() {
+    /*public List<ChefRecomendationFood> getTommorowMenu() {
         List<ChefRecomendationFood> recommendations = new ArrayList<>();
         String sql = "SELECT * FROM chefRecomendationFood WHERE Date = ?";
         try (
@@ -79,6 +80,35 @@ public class ChefRecomendationFoodDAO {
             e.printStackTrace();
         }
         return recommendations;
+    }*/
+
+    public List<FoodItem> getTommorowMenu() {
+        List<FoodItem> recommendedFoodItems = new ArrayList<>();
+        String query = "SELECT fi.foodItemId, fi.itemName, fi.price, fi.avg_rating, fi.sentiment_comment, fi.foodItemTypeId " +
+                "FROM chefrecomendationfood crf " +
+                "JOIN fooditem fi ON crf.foodItemId = fi.foodItemId " +
+                "WHERE crf.Date = CURDATE()";//"WHERE crf.Date = CURDATE() + INTERVAL 1 DAY";
+
+        try (Connection connection = Database.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
+
+            while (resultSet.next()) {
+                long foodItemId = resultSet.getLong("foodItemId");
+                String itemName = resultSet.getString("itemName");
+                double price = resultSet.getDouble("price");
+                int avgRating = resultSet.getInt("avg_rating");
+                String sentimentComment = resultSet.getString("sentiment_comment");
+                long foodItemTypeId = resultSet.getLong("foodItemTypeId");
+
+                FoodItem foodItem = new FoodItem(foodItemId, itemName, price, true, foodItemTypeId, avgRating, sentimentComment);
+                recommendedFoodItems.add(foodItem);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return recommendedFoodItems;
     }
 
     public boolean insertVote(long foodItemId) {

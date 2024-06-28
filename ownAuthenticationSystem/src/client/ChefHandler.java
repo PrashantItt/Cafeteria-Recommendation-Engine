@@ -4,38 +4,35 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.List;
 import java.util.Scanner;
 
 public class ChefHandler implements RoleHandler {
     private Socket socket;
     private PrintWriter out;
-    private BufferedReader in;
+    private BufferedReader userInput;
 
     public ChefHandler(Socket socket, PrintWriter out, BufferedReader in) {
         this.socket = socket;
         this.out = out;
-        this.in = in;
+        this.userInput = in;
     }
 
     @Override
-    public void handle() {
+    public void handle() throws IOException {
         showMenu();
     }
 
-    private void showMenu() {
+    private void showMenu() throws IOException {
         Scanner scanner = new Scanner(System.in);
         int choice;
         do {
             System.out.println("Please choose an action:");
-            System.out.println("1. Finalize Menu for Next Day");
-            System.out.println("2. Roll Out Menu for Next Day");
-            System.out.println("3. Update Availability of Menu Item");
+            System.out.println("1. Roll Out Menu for Next Day");
+            System.out.println("2. Finalize Menu for Next Day");
+            System.out.println("3. View Menu");
             System.out.println("4. Generate Monthly Report");
-            System.out.println("5. View Menu");
-            System.out.println("6. View Daily Review Comments");
-            System.out.println("7. Send Final Notification Prior to Preparing Food");
-            System.out.println("8. Send Final Notification to Employee");
+            System.out.println("5. View Discard Menu");
+            System.out.println("6. View Discard Menu Feedback");
             System.out.println("0. Exit");
 
             choice = scanner.nextInt();
@@ -46,31 +43,25 @@ public class ChefHandler implements RoleHandler {
         System.out.println("Exiting...");
     }
 
-    private void handleUserChoice(int choice, Scanner scanner) {
+    private void handleUserChoice(int choice, Scanner scanner) throws IOException {
         switch (choice) {
             case 1:
-                finalizeMenuForNextDay();
-                break;
-            case 2:
                 rollOutMenuForNextDay(scanner);
                 break;
+            case 2:
+                finalizeMenuForNextDay(scanner);
+                break;
             case 3:
-                updateAvailabilityOfMenuItem(scanner);
+                viewMenu();
                 break;
             case 4:
                 generateMonthlyReport();
                 break;
             case 5:
-                viewMenu();
+                viewDiscardMenu(scanner);
                 break;
             case 6:
-                viewDailyReviewComments();
-                break;
-            case 7:
-                sendFinalNotificationPriorToPreparingFood();
-                break;
-            case 8:
-                sendFinalNotificationToEmployee();
+                getAllFeedbackByFoodName(scanner);
                 break;
             case 0:
                 System.out.println("Exiting...");
@@ -81,59 +72,50 @@ public class ChefHandler implements RoleHandler {
         }
     }
 
-    private void finalizeMenuForNextDay() {
-        out.println("FINAL_ITEM");
-        try {
-            String response;
-            while ((response = in.readLine()) != null) {
-                System.out.println(response);
-                if (response.equals("END_OF_MENU")) {
-                    break;
-                }
-            }
+    private void finalizeMenuForNextDay(Scanner scanner) {
+        System.out.print("Enter the MenuId for the next day (comma separated Id): ");
+        String menuIds = scanner.nextLine();
+        out.println("CHEF_FINALIZE_MENU" +" "+ menuIds);
+        out.flush();
 
+        try {
+            String response = userInput.readLine();
+            System.out.println("Server reply: " + response);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Error reading response from server: " + e.getMessage());
         }
     }
 
     private void rollOutMenuForNextDay(Scanner scanner) {
-        out.println("ROLL_OUT_MENU");
+        out.println("CHEF_ROLL_OUT_MENU");
+        out.flush();
         try {
             String response;
-            while ((response = in.readLine()) != null) {
+            while ((response = userInput.readLine()) != null) {
                 System.out.println(response);
                 if (response.equals("END_OF_MENU")) {
                     break;
                 }
             }
-            String inputLine;
-            inputLine = in.readLine();
-            if (inputLine.startsWith("SEND_INPUTS")) {
-               System.out.println("expecting a format like \"foodItemId:1,foodItemTypeId:2");
-                String inputItems = scanner.nextLine();
-            }
-
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     private void updateAvailabilityOfMenuItem(Scanner scanner) {
-
         System.out.println("Update Availability of Menu Item functionality not yet implemented.");
     }
 
     private void generateMonthlyReport() {
-
         System.out.println("Generate Monthly Report functionality not yet implemented.");
     }
 
     private void viewMenu() {
-        out.println("VIEW_MENU");
+        out.println("COMMON_VIEW_MENU");
+        out.flush();
         try {
             String response;
-            while ((response = in.readLine()) != null) {
+            while ((response = userInput.readLine()) != null) {
                 System.out.println(response);
                 if (response.equals("END_OF_MENU")) {
                     break;
@@ -144,19 +126,78 @@ public class ChefHandler implements RoleHandler {
         }
     }
 
-    private void viewDailyReviewComments() {
+    private void viewDiscardMenu(Scanner scanner) throws IOException {
+        out.println("CHEF_DISCARD_MENU");
+        out.flush();
 
-        System.out.println("View Daily Review Comments functionality not yet implemented.");
+        String response;
+        while ((response = userInput.readLine()) != null) {
+            System.out.println(response);
+            if (response.equals("END_OF_MENU")) {
+                break;
+            }
+        }
+
+        handleDiscardableFoodOptions(scanner);
     }
 
-    private void sendFinalNotificationPriorToPreparingFood() {
+    private void handleDiscardableFoodOptions(Scanner scanner) throws IOException {
+        System.out.println("Console Options:");
+        System.out.println("1. Remove the Food Item from Menu List (Should be done once a month)");
+        System.out.println("   Chef will enter the food item name which needs to be removed from Menu");
+        System.out.println("2. Get Detailed Feedback (Should be done once a month)");
+        System.out.println("   Chef will roll out 3-5 questions to know more about improvements to be done for selected food item.");
+        System.out.print("Enter your choice (1 or 2): ");
+        String choice = scanner.nextLine();
+        out.flush();
 
-        System.out.println("Send Final Notification Prior to Preparing Food functionality not yet implemented.");
+        if ("1".equals(choice)) {
+            removeFoodItem(scanner);
+        } else if ("2".equals(choice)) {
+            getDetailedFeedback(scanner);
+        } else {
+            System.out.println("Invalid option. Please try again.");
+        }
     }
 
-    private void sendFinalNotificationToEmployee() {
+    private void removeFoodItem(Scanner scanner) throws IOException {
+        out.println("REMOVE_FOOD_ITEM");
+        System.out.print("Enter the name of the food item to be removed from the menu: ");
+        String foodItemName = scanner.nextLine().trim();
+        out.println("foodName " + foodItemName);
+        out.flush();
 
-        System.out.println("Send Final Notification to Employee functionality not yet implemented.");
+        String serverResponse;
+        while (!(serverResponse = userInput.readLine()).equalsIgnoreCase("End of Response")) {
+            System.out.println(serverResponse);
+        }
+    }
+
+    private void getDetailedFeedback(Scanner scanner) throws IOException {
+        out.println("GET_DETAIL_FEEDBACK");
+        System.out.print("Enter the name of the food item for which you want detailed feedback: ");
+        String foodItemName = scanner.nextLine().trim();
+        out.println(foodItemName);
+        out.flush();
+
+        String serverResponse;
+        while (!(serverResponse = userInput.readLine()).equalsIgnoreCase("End of Response")) {
+            System.out.println(serverResponse);
+        }
+    }
+
+    private void getAllFeedbackByFoodName(Scanner scanner) throws IOException {
+        System.out.print("Enter the name of the food item to view all feedback: ");
+        String foodItemName = scanner.nextLine().trim();
+        out.println("CHEF_GET_ALL_FEEDBACK_BY_FOOD_NAME"+ " "+foodItemName);
+        out.flush();
+
+        String serverResponse;
+        while ((serverResponse = userInput.readLine()) != null) {
+            System.out.println(serverResponse);
+            if (serverResponse.equalsIgnoreCase("END_OF_FEEDBACK")) {
+                break;
+            }
+        }
     }
 }
-

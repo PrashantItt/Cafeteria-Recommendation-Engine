@@ -5,15 +5,19 @@ import model.Notification;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Date;
+import model.Notification;
+import java.text.SimpleDateFormat;
 
 public class NotificationDAO {
 
     public boolean sendNotification(Notification notification) {
-        String query = "INSERT INTO Notifications (message) VALUES (?)";
+        String query = "INSERT INTO notification (message, date) VALUES (?, ?)";
         try (Connection connection = Database.getConnection();
              PreparedStatement prepStmt = connection.prepareStatement(query)) {
-
+            java.sql.Date currentDate = new java.sql.Date(new Date().getTime());
             prepStmt.setString(1, notification.getMessage());
+            prepStmt.setDate(2, currentDate);
             prepStmt.executeUpdate();
             return true;
         } catch (SQLException e) {
@@ -22,22 +26,9 @@ public class NotificationDAO {
         }
     }
 
-    public boolean deleteNotification(long notificationId) {
-        String query = "DELETE FROM Notifications WHERE notificationId = ?";
-        try (Connection connection = Database.getConnection();
-             PreparedStatement prepStmt = connection.prepareStatement(query)) {
-
-            prepStmt.setLong(1, notificationId);
-            prepStmt.executeUpdate();
-            return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
 
     public boolean updateNotification(Notification notification) {
-        String query = "UPDATE Notifications SET message = ? WHERE notificationId = ?";
+        String query = "UPDATE notification SET message = ? WHERE notificationId = ?";
         try (Connection connection = Database.getConnection();
              PreparedStatement prepStmt = connection.prepareStatement(query)) {
 
@@ -52,7 +43,7 @@ public class NotificationDAO {
     }
 
     public Notification getNotification(long notificationId) {
-        String query = "SELECT * FROM Notifications WHERE notificationId = ?";
+        String query = "SELECT * FROM notification WHERE notificationId = ?";
         try (Connection connection = Database.getConnection();
              PreparedStatement prepStmt = connection.prepareStatement(query)) {
 
@@ -60,7 +51,7 @@ public class NotificationDAO {
             try (ResultSet resultSet = prepStmt.executeQuery()) {
                 if (resultSet.next()) {
                     String message = resultSet.getString("message");
-                    String date = resultSet.getString("date");
+                    Date date = resultSet.getDate("date");
                     return new Notification(notificationId, message, date);
                 } else {
                     throw new IllegalArgumentException("No Notification with Id: " + notificationId);
@@ -72,24 +63,31 @@ public class NotificationDAO {
         }
     }
 
-    public List<Notification> getAllNotificationsAfter(long notificationId) {
+    public List<Notification> getNotificationsByCurrentDate() {
         List<Notification> notifications = new ArrayList<>();
-        String query = "SELECT * FROM Notifications WHERE notificationId > ?";
+        String query = "SELECT * FROM notification WHERE date = ?";
+
         try (Connection connection = Database.getConnection();
              PreparedStatement prepStmt = connection.prepareStatement(query)) {
 
-            prepStmt.setLong(1, notificationId);
+            java.sql.Date currentDate = new java.sql.Date(new Date().getTime());
+            prepStmt.setDate(1, currentDate);
+
             try (ResultSet resultSet = prepStmt.executeQuery()) {
                 while (resultSet.next()) {
-                    long id = resultSet.getLong("notificationId");
+                    Long id = resultSet.getLong("notificationId"); // Assuming id is an integer
                     String message = resultSet.getString("message");
-                    String date = resultSet.getString("date");
-                    notifications.add(new Notification(id, message, date));
+                    Date date = resultSet.getDate("date");
+
+                    Notification notification = new Notification(id, message, date);
+                    notifications.add(notification);
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
         return notifications;
     }
+
 }
