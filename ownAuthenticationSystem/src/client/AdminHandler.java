@@ -34,17 +34,15 @@ public class AdminHandler implements RoleHandler {
             System.out.println("5. Update Menu Items");
             System.out.println("6. Delete Menu Items");
             System.out.println("7. View Menu");
-            System.out.println("8. View Daily Review Comments");
-            System.out.println("9. Generate Monthly Report");
-            System.out.println("10. View Monthly Report");
-            System.out.println("0. Exit");
+            System.out.println("0. Logout");
 
             choice = scanner.nextInt();
             scanner.nextLine();
             handleUserChoice(choice, scanner);
         } while (choice != 0);
 
-        System.out.println("Exiting...");
+        System.out.println("Logging out...");
+        logout();
     }
 
     private void handleUserChoice(int choice, Scanner scanner) {
@@ -69,9 +67,6 @@ public class AdminHandler implements RoleHandler {
                 break;
             case 7:
                 viewMenu();
-                break;
-            case 8:
-                viewDiscardMenu();
                 break;
             default:
                 System.out.println("Invalid choice. Please try again.");
@@ -103,7 +98,7 @@ public class AdminHandler implements RoleHandler {
         String newPassword = scanner.nextLine();
         System.out.print("Enter new RoleID: ");
         Long newRoleId = scanner.nextLong();
-        scanner.nextLine(); // Consume newline
+        scanner.nextLine();
 
         out.println("ADMIN_UPDATE_USER " + username + " " + newPassword + " " + newRoleId);
         try {
@@ -139,8 +134,16 @@ public class AdminHandler implements RoleHandler {
         System.out.print("Enter food item type ID: ");
         long foodItemTypeId = scanner.nextLong();
         scanner.nextLine();
+        System.out.print("Select dietary preference (Vegetarian/Non Vegetarian/Eggetarian): ");
+        String dietaryPreference = scanner.nextLine();
+        System.out.print("Select spice level (High/Medium/Low): ");
+        String spiceLevel = scanner.nextLine();
+        System.out.print("Select cuisine preference (North Indian/South Indian/Other): ");
+        String cuisinePreference = scanner.nextLine();
+        System.out.print("Do you have a sweet tooth? (Yes/No): ");
+        String sweetTooth = scanner.nextLine();
 
-        out.println("ADMIN_ADD_MENU_ITEM " + itemName + " " + price + " " + availabilityStatus + " " + foodItemTypeId);
+        out.println("ADMIN_ADD_MENU_ITEM" +"#"+ itemName + "#" + price + "#" + availabilityStatus + "#" + foodItemTypeId + "#" + dietaryPreference + "#" + spiceLevel + "#" + cuisinePreference + "#" + sweetTooth);
         try {
             String response = in.readLine();
             System.out.println("Server reply: " + response);
@@ -148,6 +151,7 @@ public class AdminHandler implements RoleHandler {
             e.printStackTrace();
         }
     }
+
 
     private void updateMenuItems(Scanner scanner) {
         System.out.print("Enter food item ID to update: ");
@@ -164,8 +168,16 @@ public class AdminHandler implements RoleHandler {
         System.out.print("Enter new food item type ID: ");
         long foodItemTypeId = scanner.nextLong();
         scanner.nextLine();
+        System.out.print("Enter new dietary preference (Vegetarian/Non Vegetarian/Eggetarian): ");
+        String dietaryPreference = scanner.nextLine();
+        System.out.print("Enter new spice level (High/Medium/Low): ");
+        String spiceLevel = scanner.nextLine();
+        System.out.print("Enter new cuisine preference (North Indian/South Indian/Other): ");
+        String cuisinePreference = scanner.nextLine();
+        System.out.print("Do you have a sweet tooth? (Yes/No): ");
+        String sweetTooth = scanner.nextLine();
 
-        out.println("ADMIN_UPDATE_MENU_ITEM " + foodItemId + " " + itemName + " " + price + " " + availabilityStatus + " " + foodItemTypeId);
+        out.println("ADMIN_UPDATE_MENU_ITEM" +"#"+ foodItemId + "#" + itemName + "#" + price + "#" + availabilityStatus + "#" + foodItemTypeId + "#" + dietaryPreference + "#" + spiceLevel + "#" + cuisinePreference + "#" + sweetTooth);
         try {
             String response = in.readLine();
             System.out.println("Server reply: " + response);
@@ -174,10 +186,11 @@ public class AdminHandler implements RoleHandler {
         }
     }
 
+
     private void deleteMenuItems(Scanner scanner) {
         System.out.print("Enter food item ID to delete: ");
         long foodItemId = scanner.nextLong();
-        scanner.nextLine(); // Consume newline
+        scanner.nextLine();
 
         out.println("ADMIN_DELETE_MENU_ITEM " + foodItemId);
         try {
@@ -202,24 +215,14 @@ public class AdminHandler implements RoleHandler {
             e.printStackTrace();
         }
     }
-
-    private void viewDiscardMenu() {
-
-    }
-
-    private void viewDailyReviewComments() {
-        //System.out.println(username + " is viewing daily review comments.");
-        // Implement view daily review comments functionality
-    }
-
-    private void generateMonthlyReport() {
-       // System.out.println(username + " is generating the monthly report.");
-        // Implement generate monthly report functionality
-    }
-
-    private void viewMonthlyReport() {
-        //System.out.println(username + " is viewing the monthly report.");
-        // Implement view monthly report functionality
+    private void logout() {
+        out.println("LOGOUT");
+        try {
+            String response = in.readLine();
+            System.out.println("Server reply: " + response);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
 

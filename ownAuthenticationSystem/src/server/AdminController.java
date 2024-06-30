@@ -14,7 +14,8 @@ public class AdminController {
     }
 
     public void processCommand(String inputLine) {
-        String[] parts = inputLine.split(" ");
+        System.out.println("Input :"+inputLine);
+        String[] parts = inputLine.split("#");
 
 
         switch (parts[0]) {

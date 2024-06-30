@@ -3,10 +3,8 @@ package server;
 import db.*;
 import model.*;
 
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class EmployeeService {
 
@@ -45,8 +43,8 @@ public class EmployeeService {
         if (parts.length == 6) {
             try {
                 long userId = Long.parseLong(parts[1]);
-                String  foodName = parts[2];
-                String dislikeAboutFood  = parts[3];
+                String foodName = parts[2];
+                String dislikeAboutFood = parts[3];
                 String likeAboutFood = parts[4];
                 String momRecipe = parts[5];
 
@@ -70,22 +68,61 @@ public class EmployeeService {
 
     }
 
-    public String handleViewRecommendedFood(String request) {
+    public String handleViewRecommendedFood(String request, Long userId) {
         ChefRecomendationFoodDAO chefRecomendationFoodDAO = new ChefRecomendationFoodDAO();
         FoodItemTypeDAO foodItemTypeDAO = new FoodItemTypeDAO();
+        FoodItemDAO foodItemDAO = new FoodItemDAO();
+        EmployeeProfileDAO employeeProfileDAO = new EmployeeProfileDAO();
 
+        List<FoodItem> foodItems = new ArrayList<>();
         List<FoodItem> recommendedFoodItems = chefRecomendationFoodDAO.getTommorowMenu();
+
+        for (FoodItem foodItem : recommendedFoodItems) {
+            FoodItem detailedFoodItem = foodItemDAO.getFoodItemById(foodItem.getFoodItemId());
+            foodItems.add(detailedFoodItem);
+        }
+
         List<FoodItemType> foodItemTypes = foodItemTypeDAO.getAllFoodItemTypes();
         Map<Long, FoodItemType> foodItemTypeMap = new HashMap<>();
         for (FoodItemType type : foodItemTypes) {
             foodItemTypeMap.put(type.getFoodItemTypeId(), type);
         }
 
+        // Fetch employee profile
+        EmployeeProfile employeeProfile = employeeProfileDAO.getEmployeeProfile(userId);
+        String dietaryPreference = employeeProfile.getDietaryPreference();
+        String spiceLevel = employeeProfile.getSpiceLevel();
+        String cuisinePreference = employeeProfile.getCuisinePreference();
+        String sweetTooth = employeeProfile.getSweetTooth();
+
+        // Sort food items based on employee preferences
+        foodItems = foodItems.stream()
+                .sorted(Comparator.comparing((FoodItem item) -> {
+                    FoodItemType foodItemType = foodItemTypeMap.get(item.getFoodItemTypeId());
+                    return foodItemType != null ? foodItemType.getFoodItemType() : "";
+                }).thenComparing(item -> {
+                    int preferenceScore = 0;
+                    if (item.getDietaryPreference().equalsIgnoreCase(dietaryPreference)) {
+                        preferenceScore -= 4;
+                    }
+                    if (item.getSpiceLevel().equalsIgnoreCase(spiceLevel)) {
+                        preferenceScore -= 3;
+                    }
+                    if (item.getCuisinePreference().equalsIgnoreCase(cuisinePreference)) {
+                        preferenceScore -= 2;
+                    }
+                    if (item.getSweetTooth().equalsIgnoreCase(sweetTooth)) {
+                        preferenceScore -= 1;
+                    }
+                    return preferenceScore;
+                }))
+                .collect(Collectors.toList());
+
         StringBuilder menuString = new StringBuilder();
         menuString.append(String.format("%-10s %-20s %-10s %-10s %-20s %-15s %-30s\n",
                 "ID", "Name", "Price", "Available", "Type", "Avg Rating", "Sentiment Comment"));
 
-        for (FoodItem item : recommendedFoodItems) {
+        for (FoodItem item : foodItems) {
             FoodItemType foodItemType = foodItemTypeMap.get(item.getFoodItemTypeId());
             menuString.append(String.format("%-10d %-20s %-10.2f %-10s %-20s %-15d %-30s\n",
                     item.getFoodItemId(),
@@ -99,6 +136,7 @@ public class EmployeeService {
 
         return menuString.toString();
     }
+
 
     public void handleEmployeeVoting(String response) {
         String[] parts = response.split("#", 2);
@@ -114,7 +152,7 @@ public class EmployeeService {
 
     private Map<String, Long> parseVotingData(String data) {
         Map<String, Long> votingMap = new HashMap<>();
-        data = data.replaceAll("[{}]", ""); // Remove curly braces
+        data = data.replaceAll("[{}]", "");
 
         String[] entries = data.split(", ");
         for (String entry : entries) {
@@ -147,8 +185,7 @@ public class EmployeeService {
 
                     if (!response) {
                         System.err.println("Failed to insert vote for Item ID: " + entry.getValue());
-                        // Optionally return here if you want to stop further processing on failure
-                        // return;
+
                     }
                 } else {
                     System.err.println("Mismatch between food item type IDs for Meal: " + entry.getKey() + ", Item ID: " + entry.getValue());
@@ -160,4 +197,60 @@ public class EmployeeService {
         }
     }
 
+    public String handleCreateEmployeeProfile(String request) {
+        String[] parts = request.split("#");
+        if (parts.length == 7) {
+            try {
+                long userId = Long.parseLong(parts[1]);
+                String name = parts[2];
+                String dietaryPreference = parts[3];
+                String spiceLevel = parts[4];
+                String cuisinePreference = parts[5];
+                String sweetTooth = parts[6];
+
+                EmployeeProfile newProfile = new EmployeeProfile(userId, name, dietaryPreference, spiceLevel, cuisinePreference, sweetTooth);
+                EmployeeProfileDAO profileDAO = new EmployeeProfileDAO();
+
+                boolean profileAdded = profileDAO.addEmployeeProfile(newProfile);
+
+                if (profileAdded) {
+                    return "Employee profile created successfully.";
+                } else {
+                    return "Failed to create employee profile.";
+                }
+            } catch (NumberFormatException e) {
+                System.err.println("Error parsing input: " + e.getMessage());
+            }
+        }
+        return "Invalid profile creation request format.";
+
+    }
+
+    public String handleUpdateEmployeeProfile(String request) {
+        String[] parts = request.split("#");
+        if (parts.length == 7) {
+            try {
+                long userId = Long.parseLong(parts[1]);
+                String name = parts[2];
+                String dietaryPreference = parts[3];
+                String spiceLevel = parts[4];
+                String cuisinePreference = parts[5];
+                String sweetTooth = parts[6];
+
+                EmployeeProfile updatedProfile = new EmployeeProfile(userId, name, dietaryPreference, spiceLevel, cuisinePreference, sweetTooth);
+                EmployeeProfileDAO profileDAO = new EmployeeProfileDAO();
+
+                boolean profileUpdated = profileDAO.updateEmployeeProfile(updatedProfile);
+
+                if (profileUpdated) {
+                    return "Employee profile updated successfully.";
+                } else {
+                    return "Failed to update employee profile.";
+                }
+            } catch (NumberFormatException e) {
+                System.err.println("Error parsing input: " + e.getMessage());
+            }
+        }
+        return "Invalid profile update request format.";
+    }
 }

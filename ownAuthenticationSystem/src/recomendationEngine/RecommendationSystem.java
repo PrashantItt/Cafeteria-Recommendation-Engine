@@ -64,7 +64,6 @@ public class RecommendationSystem {
 
             menuItems.put(menuItemId, menuItemDetails);
 
-            // Store average rating and sentiment comment in menu table
             storeRatingAndCommentInMenu(menuItemId, averageRating, generateSentimentComment(compositeScore));
         }
 
@@ -113,7 +112,7 @@ public class RecommendationSystem {
                     .limit(3)
                     .collect(Collectors.toList());
 
-            // Retrieve full details for the top 3 items in this category
+
             List<Map<String, Object>> top3Items = new ArrayList<>();
             for (Map<String, Object> item : sortedList) {
                 Long menuItemId = (Long) item.get("Id"); // Properly retrieve menuItemId from item map
@@ -135,26 +134,6 @@ public class RecommendationSystem {
 
         return top3FoodItemsByCategory;
     }
-
-    public void printTop3FoodItemsByCategory() {
-        Map<String, List<Map<String, Object>>> top3FoodItemsByCategory = getTop3FoodItemsByCategory();
-
-        for (Map.Entry<String, List<Map<String, Object>>> categoryEntry : top3FoodItemsByCategory.entrySet()) {
-            String category = categoryEntry.getKey();
-            List<Map<String, Object>> top3Items = categoryEntry.getValue();
-
-            System.out.println("Category: " + category);
-            for (Map<String, Object> item : top3Items) {
-                System.out.println("  MenuItemId: " + item.get("Id"));
-                System.out.println("  MenuItemName: " + item.get("Name"));
-                System.out.println("  Composite Score: " + item.get("CompositeScore"));
-                System.out.println("  Average Rating: " + item.get("AverageRating"));
-                System.out.println("  Price: " + item.get("Price"));
-                System.out.println("  Sentiment Comment: " + item.get("SentimentComment"));
-            }
-        }
-    }
-
     public List<Map<String, Object>> getLowRatedFoodItems() {
         Map<Long, Map<String, Object>> menuItems = calculateSentimentScores();
         List<Map<String, Object>> lowRatedFoodItems = new ArrayList<>();
@@ -180,24 +159,11 @@ public class RecommendationSystem {
 
         return lowRatedFoodItems;
     }
-
-    public void printLowRatedFoodItems() {
-        List<Map<String, Object>> lowRatedFoodItems = getLowRatedFoodItems();
-
-        System.out.println("Low Rated Food Items:");
-        for (Map<String, Object> item : lowRatedFoodItems) {
-            System.out.println("  MenuItemId: " + item.get("Id"));
-            System.out.println("  MenuItemName: " + item.get("Name"));
-            System.out.println("  Composite Score: " + item.get("CompositeScore"));
-            System.out.println("  Price: " + item.get("Price"));
-            System.out.println("  Sentiment Comment: " + item.get("SentimentComment"));
-        }
-    }
-
     private void storeRatingAndCommentInMenu(Long menuItemId, double averageRating, String sentimentComment) {
 
         boolean response = foodItemDAO.updateRatingAndComment((Long) menuItemId, (int) averageRating, sentimentComment);
         System.out.println("response" + response);
 
     }
+
 }

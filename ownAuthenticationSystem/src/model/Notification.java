@@ -18,7 +18,6 @@ public class Notification {
 
     }
 
-    // Getters and Setters
     public long getNotificationId() {
         return notificationId;
     }

@@ -6,6 +6,9 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.sql.SQLException;
+
+import db.UserActivityDAO;
+import model.UserActivity;
 import service.UserService;
 
 public class ClientHandler implements Runnable {
@@ -16,11 +19,14 @@ public class ClientHandler implements Runnable {
     private EmployeeController employeeController;
     private CommonController commonController;
     private final UserService userService;
-
+    private Long userId;
+    private UserActivityDAO userActivityDAO;
+    private UserActivity currentUserActivity;
 
     public ClientHandler(Socket clientSocket) throws SQLException {
         this.clientSocket = clientSocket;
         this.userService = new UserService();
+        this.userActivityDAO = new UserActivityDAO();
     }
 
     @Override
@@ -31,7 +37,9 @@ public class ClientHandler implements Runnable {
             String inputLine;
             while ((inputLine = in.readLine()) != null) {
                 if (inputLine.startsWith("LOGIN ")) {
-                    handleLogin(inputLine, out);
+                   handleLogin(inputLine, out);
+                } else if (inputLine.startsWith("LOGOUT")) {
+                     handleLogout(out);
                 } else if (inputLine.startsWith("ADMIN_")) {
                     if (adminController == null) {
                         adminController = new AdminController(out);
@@ -46,7 +54,7 @@ public class ClientHandler implements Runnable {
                     if (employeeController == null) {
                         employeeController = new EmployeeController(out);
                     }
-                    employeeController.processCommand(inputLine);
+                    employeeController.processCommand(inputLine,userId);
                 } else if (inputLine.startsWith("COMMON_")) {
                     if (commonController == null) {
                         commonController = new CommonController(out,in);
@@ -75,13 +83,32 @@ public class ClientHandler implements Runnable {
             String password = parts[2];
             if (userService.validateLogin(username, password)) {
                 out.println("LOGIN SUCCESSFUL");
-                Long roleId = userService.getRoleId(username, password);
-                out.println(roleId);
+                userId= userService.getUserId(username, password);
+                UserActivity userActivity = new UserActivity(userId);
+                UserActivityDAO userActivityDAO = new UserActivityDAO();
+                boolean response = userActivityDAO.addUserActivity(userActivity);
+                out.println(userId);
             } else {
                 out.println("LOGIN FAILED");
             }
         } else {
             out.println("Invalid LOGIN command");
+        }
+    }
+
+    private void handleLogout(PrintWriter out) throws SQLException {
+        if (userId != null) {
+            UserActivity userActivity = new UserActivity(userId);
+            boolean response = userActivityDAO.updateUserActivity(userId);
+            if (response) {
+                out.println("LOGOUT SUCCESSFUL");
+            } else {
+                out.println("LOGOUT FAILED");
+            }
+            userId = null;
+            currentUserActivity = null;
+        } else {
+            out.println("No user logged in");
         }
     }
 }

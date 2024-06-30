@@ -21,7 +21,6 @@ public class ChefRecomendationFoodDAO {
                 PreparedStatement stmt = connection.prepareStatement(sql)
         ) {
             stmt.setLong(1, recommendation.getFoodItemId());
-           // stmt.setLong(2, recommendation.getFoodtypeId());
             int affectedRows = stmt.executeUpdate();
             return affectedRows == 1;
         } catch (SQLException e) {
@@ -30,7 +29,6 @@ public class ChefRecomendationFoodDAO {
         }
     }
 
-    // Method to retrieve all recommendations
     public List<ChefRecomendationFood> getAll() {
         List<ChefRecomendationFood> recommendations = new ArrayList<>();
         String sql = "SELECT * FROM chefRecomendationFood";
@@ -54,33 +52,6 @@ public class ChefRecomendationFoodDAO {
         }
         return recommendations;
     }
-
-    // Method to retrieve recommendations for today's date
-    /*public List<ChefRecomendationFood> getTommorowMenu() {
-        List<ChefRecomendationFood> recommendations = new ArrayList<>();
-        String sql = "SELECT * FROM chefRecomendationFood WHERE Date = ?";
-        try (
-                Connection connection = Database.getConnection();
-                PreparedStatement stmt = connection.prepareStatement(sql)
-        ) {
-            stmt.setDate(1, Date.valueOf(LocalDate.now()));
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    long foodItemId = rs.getLong("foodItemId");
-                    long foodtypeId = rs.getLong("foodtypeId");
-                    Date date = rs.getDate("Date");
-
-                    // Create ChefRecomendationFood object using constructor
-                    ChefRecomendationFood recommendation = new ChefRecomendationFood( foodItemId, foodtypeId);
-
-                    recommendations.add(recommendation);
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return recommendations;
-    }*/
 
     public List<FoodItem> getTommorowMenu() {
         List<FoodItem> recommendedFoodItems = new ArrayList<>();
@@ -155,9 +126,6 @@ public class ChefRecomendationFoodDAO {
         }
         return topFoodItems;
     }
-
-
-
 
 }
 

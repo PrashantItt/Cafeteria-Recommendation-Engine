@@ -27,8 +27,6 @@ public class FeedbackDAO {
         }
         return false;
     }
-
-    // Method to fetch all feedback from the database
     public List<Feedback> getAllFeedback() {
         List<Feedback> feedbacks = new ArrayList<>();
         String sql = "SELECT * FROM Feedback";

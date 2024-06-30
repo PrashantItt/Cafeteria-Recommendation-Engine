@@ -9,7 +9,6 @@ public class FoodItemType {
         this.foodItemType = foodItemType;
     }
 
-    // Getters and Setters
     public long getFoodItemTypeId() {
         return foodItemTypeId;
     }

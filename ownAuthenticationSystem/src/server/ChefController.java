@@ -25,13 +25,13 @@ public class ChefController {
 
 
         switch (parts[0]) {
-            case "CHEF_FINALIZE_MENU"://CHEF_FINALIZE_MENU//CHEF_ROLLOUT_NEXT_DAY_MENU
+            case "CHEF_FINALIZE_MENU":
                 handleFinalizeCreationMenu(inputLine,out);
                 break;
             case "CHEF_ROLL_OUT_MENU":
                 handleRoleItemMenu(inputLine);
                 break;
-            case "CHEF_FINAL_ITEM"://CHEF_FINAL_ITEM
+            case "CHEF_FINAL_ITEM":
                 handleFinalizeMenu();
                 break;
             case "CHEF_DISCARD_MENU":
@@ -54,12 +54,10 @@ public class ChefController {
 
     private void handleRoleItemMenu(String arguments) throws SQLException {
         chefService.handleRoleItemMenu(arguments,out);
-        //out.println(response);
     }
 
     private void handleFinalizeMenu() {
         chefService.handleFinalizeMenu(out);
-        //out.println(response);
     }
     private void handleDisplayDiscardMenuList(String inputLine, PrintWriter out){
         chefService.handleDisplayDiscardMenuList(inputLine,out);

@@ -13,6 +13,7 @@ public class EmployeeHandler implements RoleHandler {
     private Socket socket;
     private PrintWriter out;
     private BufferedReader in;
+    private long UserId;
 
     public EmployeeHandler(Socket socket, PrintWriter out, BufferedReader in) {
         this.socket = socket;
@@ -35,6 +36,8 @@ public class EmployeeHandler implements RoleHandler {
             System.out.println("3. Select Food Items for Tomorrow's Menu");
             System.out.println("4. Submit Feedback");
             System.out.println("5. Submit Feedbak For Discard Menu");
+            System.out.println("6. Create Profile");
+            System.out.println("7. Update Profile");
             System.out.println("0. Exit");
 
             choice = scanner.nextInt();
@@ -61,6 +64,12 @@ public class EmployeeHandler implements RoleHandler {
                 break;
             case 5:
                 discardMenuFeedback(scanner);
+            case 6:
+                createProfile(scanner);
+                break;
+            case 7:
+                updateProfile(scanner);
+                break;
             case 0:
                 System.out.println("Exiting...");
                 break;
@@ -113,16 +122,6 @@ public class EmployeeHandler implements RoleHandler {
             Map<String, Long> votingInput = VotingForMenu(scanner);
             out.println("EMPLOYEE_VOTING_INPUT" +"#" + votingInput);
 
-            /*System.out.println("Enter the food item ID to vote for (or 0 to exit):");
-            long foodItemId = scanner.nextLong();
-            if (foodItemId != 0) {
-                out.println(foodItemId);
-
-                String voteResponse = in.readLine();
-                System.out.println(voteResponse);
-            } else {
-                System.out.println("Exiting without voting.");
-            }*/
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -206,5 +205,65 @@ public class EmployeeHandler implements RoleHandler {
             e.printStackTrace();
         }
     }
+    private void createProfile(Scanner scanner) {
+        System.out.print("Enter your user ID: ");
+        long userId = scanner.nextLong();
+        scanner.nextLine();
+
+        System.out.print("Enter your name: ");
+        String name = scanner.nextLine().trim();
+
+        System.out.print("Enter your dietary preference (Vegetarian/Non Vegetarian/Eggetarian): ");
+        String dietaryPreference = scanner.nextLine().trim();
+
+        System.out.print("Enter your spice level preference (High/Medium/Low): ");
+        String spiceLevel = scanner.nextLine().trim();
+
+        System.out.print("Enter your cuisine preference (North Indian/South Indian/Other): ");
+        String cuisinePreference = scanner.nextLine().trim();
+
+        System.out.print("Do you have a sweet tooth? (Yes/No): ");
+        String sweetTooth = scanner.nextLine().trim();
+
+        out.println("EMPLOYEE_CREATE_PROFILE" + "#" + userId + "#" + name + "#" + dietaryPreference + "#" + spiceLevel + "#" + cuisinePreference + "#" + sweetTooth);
+
+        try {
+            String response = in.readLine();
+            System.out.println("Server reply: " + response);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void updateProfile(Scanner scanner) {
+        System.out.print("Enter your user ID: ");
+        long userId = scanner.nextLong();
+        scanner.nextLine();
+
+        System.out.print("Enter your updated name (press Enter to skip): ");
+        String name = scanner.nextLine().trim();
+
+        System.out.print("Enter your updated dietary preference (press Enter to skip): ");
+        String dietaryPreference = scanner.nextLine().trim();
+
+        System.out.print("Enter your updated spice level preference (press Enter to skip): ");
+        String spiceLevel = scanner.nextLine().trim();
+
+        System.out.print("Enter your updated cuisine preference (press Enter to skip): ");
+        String cuisinePreference = scanner.nextLine().trim();
+
+        System.out.print("Update your sweet tooth preference? (Yes/No, press Enter to skip): ");
+        String sweetTooth = scanner.nextLine().trim();
+
+        out.println("EMPLOYEE_UPDATE_PROFILE" + "#" + userId + "#" + name + "#" + dietaryPreference + "#" + spiceLevel + "#" + cuisinePreference + "#" + sweetTooth);
+
+        try {
+            String response = in.readLine();
+            System.out.println("Server reply: " + response);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 }

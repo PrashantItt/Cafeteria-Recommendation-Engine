@@ -16,7 +16,7 @@ public class AdminService {
 
     public String handleAddUser(String inputLine) throws SQLException {
         System.out.println(inputLine);
-        String[] parts = inputLine.split(" ");
+        String[] parts = inputLine.split("#");
         System.out.println(parts.length);
 
         if (parts.length == 4) {
@@ -37,7 +37,7 @@ public class AdminService {
     }
 
     public String handleUpdateUser(String inputLine) {
-        String[] parts = inputLine.split(" ");
+        String[] parts = inputLine.split("#");
         if (parts.length == 4) {
             String username = parts[1];
             String newPassword = parts[2];
@@ -56,7 +56,7 @@ public class AdminService {
     }
 
     public String handleDeleteUser(String inputLine) {
-        String[] parts = inputLine.split(" ");
+        String[] parts = inputLine.split("#");
         if (parts.length == 2) {
             String username = parts[1];
             UserDAO userDAO = new UserDAO();
@@ -68,15 +68,20 @@ public class AdminService {
     }
 
     public String handleAddMenuItem(String inputLine) {
-        String[] parts = inputLine.split(" ");
-        if (parts.length == 5) {
+        String[] parts = inputLine.split("#");
+        System.out.println(parts.length);
+        if (parts.length == 9) {
             String itemName = parts[1];
             try {
                 double price = Double.parseDouble(parts[2]);
                 boolean availabilityStatus = Boolean.parseBoolean(parts[3]);
                 long foodItemTypeId = Long.parseLong(parts[4]);
+                String dietaryPreference = parts[5];
+                String spiceLevel = parts[6];
+                String cuisinePreference = parts[7];
+                String sweetTooth = parts[8];
 
-                FoodItem foodItem = new FoodItem(itemName, price, availabilityStatus, foodItemTypeId);
+                FoodItem foodItem = new FoodItem(itemName, price, availabilityStatus, foodItemTypeId, dietaryPreference, spiceLevel, cuisinePreference, sweetTooth);
                 FoodItemDAO foodItemDAO = new FoodItemDAO();
                 foodItemDAO.addFoodItem(foodItem);
                 return "Menu item added successfully";
@@ -88,38 +93,41 @@ public class AdminService {
         }
     }
 
+
     public String handleUpdateMenuItem(String inputLine) {
-        System.out.println(inputLine);
-        String[] parts = inputLine.split(" ");
-        System.out.println(parts.length);
-        if (parts.length == 6) {
+        System.out.println("HI handle");
+        String[] parts = inputLine.split("#");
+        if (parts.length == 10) {
             try {
-                long id = Long.parseLong(parts[1]);
+                long foodItemId = Long.parseLong(parts[1]);
                 String itemName = parts[2];
                 double price = Double.parseDouble(parts[3]);
                 boolean availabilityStatus = Boolean.parseBoolean(parts[4]);
                 long foodItemTypeId = Long.parseLong(parts[5]);
+                String dietaryPreference = parts[6];
+                String spiceLevel = parts[7];
+                String cuisinePreference = parts[8];
+                String sweetTooth = parts[9];
 
-                FoodItem foodItem = new FoodItem(id, itemName, price, availabilityStatus, foodItemTypeId);
+                FoodItem foodItem = new FoodItem(foodItemId, itemName, price, availabilityStatus, foodItemTypeId, dietaryPreference, spiceLevel, cuisinePreference, sweetTooth);
                 FoodItemDAO foodItemDAO = new FoodItemDAO();
-                boolean response = foodItemDAO.updateFoodItem(foodItem);
-                if (response) {
+                boolean success = foodItemDAO.updateFoodItem(foodItem);
+                if (success) {
                     return "Menu item updated successfully";
                 } else {
-                    return "Menu item not updated successfully";
+                    return "Error updating menu item";
                 }
-
             } catch (NumberFormatException e) {
-                return "Error updating menu item: " + e.getMessage();
+                return "Error parsing menu item data";
             }
-        }
-         else {
+        } else {
             return "Invalid UPDATE_MENU_ITEM command";
         }
     }
 
+
     public String handleDeleteMenuItem(String inputLine) {
-        String[] parts = inputLine.split(" ");
+        String[] parts = inputLine.split("#");
         if (parts.length == 2) {
             try {
                 long foodItemId = Long.parseLong(parts[1]);

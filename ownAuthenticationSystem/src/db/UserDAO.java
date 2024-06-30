@@ -8,26 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserDAO {
-
-    public List<User> getAllUsers() {
-        List<User> users = new ArrayList<>();
-        try (Connection connection = Database.getConnection();
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery("SELECT * FROM User")) {
-
-            while (resultSet.next()) {
-                long userId = resultSet.getLong("userId");
-                String name = resultSet.getString("name");
-                long roleId = resultSet.getLong("roleId");
-                String password = resultSet.getString("password");
-                users.add(new User(userId, name, password, roleId));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return users;
-    }
-
     public User getUserById(int userId) {
         User user = null;
         try (Connection connection = Database.getConnection();
@@ -89,19 +69,7 @@ public class UserDAO {
         return false;
     }
 
-    public boolean changePassword(int id, String newPassword) {
-        try (Connection connection = Database.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement("UPDATE User SET password = ? WHERE id = ?")) {
-
-            preparedStatement.setString(1, newPassword);
-            preparedStatement.setInt(2, id);
-            return preparedStatement.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-    public Long getRoleIdByUsernameAndPassword(String username, String password) {
+    public Long getUserIdByUsernameAndPassword(String username, String password) {
         Long roleId = null;
         try (Connection connection = Database.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement("SELECT roleId FROM User WHERE name = ? AND password = ?")) {

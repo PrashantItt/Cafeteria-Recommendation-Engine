@@ -1,7 +1,5 @@
 package model;
 
-// FoodRecommendationDTO.java
-
 import java.util.Date;
 
 public class FoodRecommendation {

@@ -12,7 +12,7 @@ public class EmployeeController {
         this.out = out;
     }
 
-    public void processCommand(String inputLine) {
+    public void processCommand(String inputLine,long userId) {
         String[] parts = inputLine.split("#");
         System.out.println(parts.length);
         String command = parts[0];
@@ -27,11 +27,17 @@ public class EmployeeController {
                 handleDiscardMenuFeedback(inputLine);
                 break;
             case "EMPLOYEE_VIEW_TOMORROW_FOOD":
-                handleViewRecommendedFood(inputLine);
+                handleViewRecommendedFood(inputLine,userId);
                 break;
             case "EMPLOYEE_VOTING_INPUT":
                 handleEmployeeVoting(inputLine);
-
+                break;
+            case "EMPLOYEE_CREATE_PROFILE":
+                handleCreateEmployeeProfile(inputLine);
+                break;
+            case "EMPLOYEE_UPDATE_PROFILE":
+                handleUpdateEmployeeProfile(inputLine);
+                break;
             default:
                 out.println("Invalid EMPLOYEE command");
         }
@@ -46,13 +52,22 @@ public class EmployeeController {
         String response = employeeService.handleDiscardMenuFeedback(request);
         out.println(response);
     }
-    private void handleViewRecommendedFood(String request) {
-        String response = employeeService.handleViewRecommendedFood(request);
+    private void handleViewRecommendedFood(String request,Long userId) {
+        String response = employeeService.handleViewRecommendedFood(request,userId);
         System.out.println("response"+response);
         out.println(response);
         out.println("END_OF_MENU");
     }
     private void handleEmployeeVoting(String request) {
         employeeService.handleEmployeeVoting(request);
+    }
+    private void handleCreateEmployeeProfile(String request) {
+        String response = employeeService.handleCreateEmployeeProfile(request);
+        out.println(response);
+    }
+
+    private void handleUpdateEmployeeProfile(String request) {
+        String response = employeeService.handleUpdateEmployeeProfile(request);
+        out.println(response);
     }
 }

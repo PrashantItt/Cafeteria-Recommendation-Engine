@@ -9,7 +9,8 @@ public class UserService {
     public boolean validateLogin(String username, String password) {
         return userDAO.validateUser(username, password);
     }
-    public Long getRoleId(String username, String password) {
-        return userDAO.getRoleIdByUsernameAndPassword(username,password);
+    public Long getUserId(String username, String password) {
+        return userDAO.getUserIdByUsernameAndPassword(username,password);
     }
+
 }

@@ -8,7 +8,6 @@ public class ChefRecomendationFood {
     private long foodtypeId;
     private Date date;
 
-    private long vote;
 
 
     public ChefRecomendationFood(long foodItemId, long foodtypeId) {
@@ -19,7 +18,6 @@ public class ChefRecomendationFood {
         this.foodItemId = foodItemId;
     }
 
-    // Getters and setters
     public long getId() {
         return id;
     }
@@ -53,7 +51,6 @@ public class ChefRecomendationFood {
         this.date = date;
     }
 
-    // toString method for printing the object
     @Override
     public String toString() {
         return "ChefRecomendationFood{" +

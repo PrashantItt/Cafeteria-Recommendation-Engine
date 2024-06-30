@@ -102,10 +102,6 @@ public class ChefHandler implements RoleHandler {
         }
     }
 
-    private void updateAvailabilityOfMenuItem(Scanner scanner) {
-        System.out.println("Update Availability of Menu Item functionality not yet implemented.");
-    }
-
     private void generateMonthlyReport() {
         System.out.println("Generate Monthly Report functionality not yet implemented.");
     }
