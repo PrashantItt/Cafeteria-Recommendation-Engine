@@ -10,8 +10,7 @@ import java.util.List;
 public class UserDAO {
     public User getUserById(int userId) {
         User user = null;
-        try (Connection connection = Database.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM User WHERE id = ?")) {
+        try (Connection connection = Database.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM User WHERE id = ?")) {
 
             preparedStatement.setInt(1, userId);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -31,8 +30,7 @@ public class UserDAO {
     }
 
     public boolean addUser(User user) {
-        try (Connection connection = Database.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO User (name, roleId, password) VALUES (?, ?, ?)")) {
+        try (Connection connection = Database.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO User (name, roleId, password) VALUES (?, ?, ?)")) {
 
             preparedStatement.setString(1, user.getName());
             preparedStatement.setLong(2, user.getRoleId());
@@ -45,8 +43,7 @@ public class UserDAO {
     }
 
     public boolean updateUser(User user) {
-        try (Connection connection = Database.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement("UPDATE User SET roleId = ?, password = ? WHERE name = ?")) {
+        try (Connection connection = Database.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement("UPDATE User SET roleId = ?, password = ? WHERE name = ?")) {
             preparedStatement.setLong(1, user.getRoleId());
             preparedStatement.setString(2, user.getPassword());
             preparedStatement.setString(3, user.getName());
@@ -58,8 +55,7 @@ public class UserDAO {
     }
 
     public boolean deleteUser(String UserName) {
-        try (Connection connection = Database.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM User WHERE name = ?")) {
+        try (Connection connection = Database.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM User WHERE name = ?")) {
 
             preparedStatement.setString(1, UserName);
             return preparedStatement.executeUpdate() > 0;
@@ -71,8 +67,7 @@ public class UserDAO {
 
     public Long getUserIdByUsernameAndPassword(String username, String password) {
         Long roleId = null;
-        try (Connection connection = Database.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement("SELECT roleId FROM User WHERE name = ? AND password = ?")) {
+        try (Connection connection = Database.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement("SELECT roleId FROM User WHERE name = ? AND password = ?")) {
 
             preparedStatement.setString(1, username);
             preparedStatement.setString(2, password);
@@ -89,8 +84,7 @@ public class UserDAO {
     }
 
     public boolean validateUser(String username, String password) {
-        try (Connection connection = Database.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM User WHERE name = ? AND password = ?")) {
+        try (Connection connection = Database.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM User WHERE name = ? AND password = ?")) {
 
             preparedStatement.setString(1, username);
             preparedStatement.setString(2, password);

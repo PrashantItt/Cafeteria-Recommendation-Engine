@@ -4,19 +4,17 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 import model.DiscardFoodFeedback;
 import db.Database;
 
 public class DiscardFoodFeedbackDAO {
 
 
-
     public boolean insert(DiscardFoodFeedback feedback) {
-        String query = "INSERT INTO discardfoodfeedback (foodName, userID, question1, question2, question3, feedbackDate) " +
-                "VALUES (?, ?, ?, ?, ?, CURDATE())";
+        String query = "INSERT INTO discardfoodfeedback (foodName, userID, question1, question2, question3, feedbackDate) " + "VALUES (?, ?, ?, ?, ?, CURDATE())";
 
-        try (Connection connection = Database.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+        try (Connection connection = Database.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
             preparedStatement.setString(1, feedback.getFoodName());
             preparedStatement.setInt(2, feedback.getUserID());
@@ -32,13 +30,11 @@ public class DiscardFoodFeedbackDAO {
     }
 
 
-
     public List<DiscardFoodFeedback> getFeedbacksByFoodName(String foodName) {
         List<DiscardFoodFeedback> feedbacks = new ArrayList<>();
         String query = "SELECT * FROM discardfoodfeedback WHERE foodName = ?";
 
-        try (Connection connection = Database.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+        try (Connection connection = Database.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
             preparedStatement.setString(1, foodName);
 

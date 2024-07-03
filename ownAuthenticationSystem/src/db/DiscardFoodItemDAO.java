@@ -15,8 +15,7 @@ public class DiscardFoodItemDAO {
 
     public boolean addDiscardFoodItemByName(String foodName) {
         String sql = "INSERT INTO discardedfoods (foodName, discardDate) VALUES (?, CURDATE())";
-        try (Connection connection = Database.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection connection = Database.getConnection(); PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             statement.setString(1, foodName);
 
@@ -30,9 +29,7 @@ public class DiscardFoodItemDAO {
     public List<DiscardFoodItem> getAllDiscardFoodItems() {
         List<DiscardFoodItem> discardFoodItems = new ArrayList<>();
         String sql = "SELECT * FROM discardedfoods";
-        try (Connection connection = Database.getConnection();
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(sql)) {
+        try (Connection connection = Database.getConnection(); Statement statement = connection.createStatement(); ResultSet resultSet = statement.executeQuery(sql)) {
 
             while (resultSet.next()) {
                 long id = resultSet.getLong("Id");
@@ -41,9 +38,9 @@ public class DiscardFoodItemDAO {
                 String dislikeAboutFood = resultSet.getString("dislikeAboutFood");
                 String momRecipe = resultSet.getString("momRecipe");
                 long userId = resultSet.getLong("userId");
-                Date  date = resultSet.getDate("discardDate");
+                Date date = resultSet.getDate("discardDate");
 
-                discardFoodItems.add(new DiscardFoodItem(id, foodName, likeAboutFood, dislikeAboutFood, momRecipe,userId,date));
+                discardFoodItems.add(new DiscardFoodItem(id, foodName, likeAboutFood, dislikeAboutFood, momRecipe, userId, date));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -52,12 +49,10 @@ public class DiscardFoodItemDAO {
     }
 
 
-
     public List<DiscardFoodItem> getDiscardFoodItemsByName(String foodName) {
         List<DiscardFoodItem> discardFoodItems = new ArrayList<>();
         String sql = "SELECT * FROM discardedfoods WHERE foodName = ?";
-        try (Connection connection = Database.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (Connection connection = Database.getConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setString(1, foodName);
             try (ResultSet resultSet = statement.executeQuery()) {

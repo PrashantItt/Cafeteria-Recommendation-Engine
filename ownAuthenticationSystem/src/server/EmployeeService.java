@@ -3,8 +3,10 @@ package server;
 import db.*;
 import model.*;
 
+import java.io.PrintWriter;
 import java.util.*;
 import java.util.stream.Collectors;
+
 
 public class EmployeeService {
 
@@ -88,14 +90,12 @@ public class EmployeeService {
             foodItemTypeMap.put(type.getFoodItemTypeId(), type);
         }
 
-        // Fetch employee profile
         EmployeeProfile employeeProfile = employeeProfileDAO.getEmployeeProfile(userId);
         String dietaryPreference = employeeProfile.getDietaryPreference();
         String spiceLevel = employeeProfile.getSpiceLevel();
         String cuisinePreference = employeeProfile.getCuisinePreference();
         String sweetTooth = employeeProfile.getSweetTooth();
 
-        // Sort food items based on employee preferences
         foodItems = foodItems.stream()
                 .sorted(Comparator.comparing((FoodItem item) -> {
                     FoodItemType foodItemType = foodItemTypeMap.get(item.getFoodItemTypeId());
@@ -138,13 +138,13 @@ public class EmployeeService {
     }
 
 
-    public void handleEmployeeVoting(String response) {
+    public void handleEmployeeVoting(String response, PrintWriter out) {
         String[] parts = response.split("#", 2);
         if (parts.length == 2 && parts[0].equals("EMPLOYEE_VOTING_INPUT")) {
             String votingData = parts[1];
             Map<String, Long> votingMap = parseVotingData(votingData);
 
-            processVotes(votingMap);
+            processVotes(votingMap,out);
         } else {
             System.out.println("Invalid input or no voting data received.");
         }
@@ -167,7 +167,7 @@ public class EmployeeService {
         return votingMap;
     }
 
-    private void processVotes(Map<String, Long> votingMap) {
+    private void processVotes(Map<String, Long> votingMap,PrintWriter out) {
         System.out.println("Processing Votes:");
         for (Map.Entry<String, Long> entry : votingMap.entrySet()) {
             System.out.println("Meal: " + entry.getKey() + ", Item ID: " + entry.getValue());
@@ -184,17 +184,19 @@ public class EmployeeService {
                     boolean response = chefRecomendationFoodDAO.insertVote(entry.getValue());
 
                     if (!response) {
-                        System.err.println("Failed to insert vote for Item ID: " + entry.getValue());
-
+                        out.println("ERROR: Failed to insert vote for Item ID: " + entry.getValue());
+                    } else {
+                        out.println("SUCCESS: Vote inserted for Item ID: " + entry.getValue());
                     }
                 } else {
-                    System.err.println("Mismatch between food item type IDs for Meal: " + entry.getKey() + ", Item ID: " + entry.getValue());
+                    out.println("ERROR: Mismatch between food item type IDs for Meal: " + entry.getKey() + ", Item ID: " + entry.getValue());
                 }
             } catch (Exception e) {
-                System.err.println("An error occurred while processing vote for Meal: " + entry.getKey() + ", Item ID: " + entry.getValue());
-                e.printStackTrace();
+                out.println("ERROR: An error occurred while processing vote for Meal: " + entry.getKey() + ", Item ID: " + entry.getValue());
+                e.printStackTrace(out);
             }
         }
+        out.println("END_OF_VOTING_PROCESS");
     }
 
     public String handleCreateEmployeeProfile(String request) {
@@ -253,4 +255,29 @@ public class EmployeeService {
         }
         return "Invalid profile update request format.";
     }
+
+    public String handleViewNotification(String request) {
+        String[] parts = request.split("#");
+
+        if (parts.length == 1) {
+            NotificationDAO notificationDAO = new NotificationDAO();
+            List<Notification> notificationList = notificationDAO.getNotificationsByCurrentDate();
+
+            StringBuilder notificationString = new StringBuilder();
+            notificationString.append(String.format("%-15s %-50s %-20s\n", "Notification ID", "Message", "Date"));
+
+            for (Notification notification : notificationList) {
+                notificationString.append(String.format("%-15d %-50s %-20s\n",
+                        notification.getNotificationId(),
+                        notification.getMessage(),
+                        notification.getDate().toString()));
+            }
+            notificationString.append("END_OF_NOTIFICATIONS");
+            return notificationString.toString();
+        } else {
+            return "Invalid View Notification request format.";
+        }
+    }
+
+
 }

@@ -15,7 +15,6 @@ import java.util.Map;
 public class AdminService {
 
     public String handleAddUser(String inputLine) throws SQLException {
-        System.out.println(inputLine);
         String[] parts = inputLine.split("#");
         System.out.println(parts.length);
 
@@ -60,8 +59,13 @@ public class AdminService {
         if (parts.length == 2) {
             String username = parts[1];
             UserDAO userDAO = new UserDAO();
-            userDAO.deleteUser(username);
+            boolean response = userDAO.deleteUser(username);
+            if(response) {
             return "User deleted successfully";
+            }
+            else {
+                return "User deleted Operation Unsuccessfully.";
+            }
         } else {
             return "Invalid DELETE_USER command";
         }
@@ -95,7 +99,6 @@ public class AdminService {
 
 
     public String handleUpdateMenuItem(String inputLine) {
-        System.out.println("HI handle");
         String[] parts = inputLine.split("#");
         if (parts.length == 10) {
             try {

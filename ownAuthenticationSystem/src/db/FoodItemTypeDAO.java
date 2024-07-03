@@ -11,8 +11,7 @@ public class FoodItemTypeDAO {
 
     public boolean addFoodItemType(String foodItemType) {
         String query = "INSERT INTO foodItemType (foodItemType) VALUES (?)";
-        try (Connection connection = Database.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+        try (Connection connection = Database.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
             preparedStatement.setString(1, foodItemType);
             return preparedStatement.executeUpdate() > 0;
@@ -22,37 +21,10 @@ public class FoodItemTypeDAO {
         return false;
     }
 
-    public boolean deleteFoodItemType(long foodItemTypeId) {
-        String query = "DELETE FROM foodItemType WHERE foodItemTypeId = ?";
-        try (Connection connection = Database.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-
-            preparedStatement.setLong(1, foodItemTypeId);
-            return preparedStatement.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    public boolean updateFoodItemType(long foodItemTypeId, String foodItemType) {
-        String query = "UPDATE foodItemType SET foodItemType = ? WHERE foodItemTypeId = ?";
-        try (Connection connection = Database.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-
-            preparedStatement.setString(1, foodItemType);
-            preparedStatement.setLong(2, foodItemTypeId);
-            return preparedStatement.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
 
     public FoodItemType getFoodItemTypeById(long foodItemTypeId) {
         String query = "SELECT * FROM foodItemType WHERE foodItemTypeId = ?";
-        try (Connection connection = Database.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+        try (Connection connection = Database.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
             preparedStatement.setLong(1, foodItemTypeId);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -71,8 +43,7 @@ public class FoodItemTypeDAO {
 
     public FoodItemType getFoodItemTypeByName(String foodItemType) {
         String query = "SELECT * FROM foodItemType WHERE foodItemType = ?";
-        try (Connection connection = Database.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+        try (Connection connection = Database.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
             preparedStatement.setString(1, foodItemType);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -92,9 +63,7 @@ public class FoodItemTypeDAO {
     public List<FoodItemType> getAllFoodItemTypes() {
         List<FoodItemType> foodItemTypes = new ArrayList<>();
         String query = "SELECT * FROM foodItemType";
-        try (Connection connection = Database.getConnection();
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(query)) {
+        try (Connection connection = Database.getConnection(); Statement statement = connection.createStatement(); ResultSet resultSet = statement.executeQuery(query)) {
 
             while (resultSet.next()) {
                 long foodItemTypeId = resultSet.getLong("foodItemTypeId");

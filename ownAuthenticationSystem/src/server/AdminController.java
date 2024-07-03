@@ -14,9 +14,7 @@ public class AdminController {
     }
 
     public void processCommand(String inputLine) {
-        System.out.println("Input :"+inputLine);
         String[] parts = inputLine.split("#");
-
 
         switch (parts[0]) {
             case "ADMIN_ADD_USER":

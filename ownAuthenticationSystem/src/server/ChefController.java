@@ -36,8 +36,10 @@ public class ChefController {
                 break;
             case "CHEF_DISCARD_MENU":
                 handleDiscardMenuList(out,in);
+                break;
             case "CHEF_GET_ALL_FEEDBACK_BY_FOOD_NAME":
                 handleDisplayDiscardMenuList(inputLine,out);
+                break;
             default:
                 out.println("Invalid CHEF command");
         }

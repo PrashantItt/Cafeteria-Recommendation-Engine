@@ -1,13 +1,11 @@
 package server;
 
-import db.ChefRecomendationFoodDAO;
-import db.DiscardFoodFeedbackDAO;
-import db.DiscardFoodItemDAO;
+import db.*;
 import model.ChefRecomendationFood;
 import model.DiscardFoodFeedback;
 import model.DiscardFoodItem;
+import model.Feedback;
 import recomendationEngine.RecommendationSystem;
-import db.FoodItemDAO;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -29,8 +27,8 @@ public class ChefService {
         String[] parts = menuIds[1].split(",");
         boolean allFoodsAdded = true;
 
-        for (int i = 0; i < parts.length; i++) {
-            String foodIdStr = parts[i].trim();
+        for (int index = 0; index < parts.length; index++) {
+            String foodIdStr = parts[index].trim();
             try {
                 Long foodItemId = Long.parseLong(foodIdStr);
                 ChefRecomendationFood chefRecomendationFood = new ChefRecomendationFood(foodItemId);
@@ -120,10 +118,11 @@ public class ChefService {
 
     private boolean handleGetDetailedFeedback(BufferedReader in, PrintWriter out) throws IOException {
         String response = in.readLine();
-        String[] foodItemName = response.split(" ");
+        String[] foodItemName = response.split("#");
         if (foodItemName.length == 1) {
             try {
                 String foodName = foodItemName[0];
+                System.out.println("foodName"+foodName);
                 DiscardFoodItemDAO discardFoodItemDAO = new DiscardFoodItemDAO();
                 return discardFoodItemDAO.addDiscardFoodItemByName(foodName);
             } catch (NumberFormatException e) {
@@ -135,7 +134,7 @@ public class ChefService {
 
     private void handleRemoveFoodItem(BufferedReader in, PrintWriter out) throws IOException {
         String response = in.readLine();
-        String[] foodItemDetails = response.split(" ");
+        String[] foodItemDetails = response.split("#");
         if (foodItemDetails.length < 2) {
             out.println("Invalid input format. Please provide food item name.");
             out.println("End of Response");
@@ -169,25 +168,32 @@ public class ChefService {
 
     public void handleDisplayDiscardMenuList(String inputLine, PrintWriter out) {
         String[] parts = inputLine.split(" ");
+        if (parts.length < 2) {
+            out.println("Invalid input format. Please provide food name.");
+            out.println("END_OF_MENU");
+            return;
+        }
+
+        String foodName = parts[1];
         System.out.println(parts[0]);
         DiscardFoodFeedbackDAO discardFoodFeedbackDAO = new DiscardFoodFeedbackDAO();
-        List<DiscardFoodFeedback> discardFoodItemList = discardFoodFeedbackDAO.getFeedbacksByFoodName(parts[1]);
+        List<DiscardFoodFeedback> discardFoodItemList = discardFoodFeedbackDAO.getFeedbacksByFoodName(foodName);
 
-        out.printf("%-10s %-15s %-15s %-15s %-30s %20s\n",
-                "Id", "FoodName","UserId", "Like", "Dislike", "MomRecipe", "DiscardDate");
-        out.println("-------------------------------------------------------------------");
+        out.printf("%-10s %-15s %-15s %-15s %-20s %-20s %-20s\n",
+                "Id", "FoodName","UserId", "Question1", "Question2", "Question3", "DiscardDate");
+        out.println("----------------------------------------------------------------------------------------------------------------------");
 
         for (DiscardFoodFeedback item : discardFoodItemList) {
-            out.printf("%-10d %-15d %-15s %-15s %-30s %20s\n",
+            out.printf("%-10d %-15s %-15d %-15s %-20s %-20s %-20s\n",
                     item.getId(),
                     item.getFoodName(),
                     item.getUserID(),
                     item.getQuestion1(),
                     item.getQuestion2(),
                     item.getQuestion3(),
-                    item.getFeedbackDate());
+                    item.getFeedbackDate().toString());
         }
 
-        out.println("END_OF_MENU");
+        out.println("END_OF_FEEDBACK");
     }
 }

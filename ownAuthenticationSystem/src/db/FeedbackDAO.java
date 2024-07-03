@@ -12,8 +12,7 @@ public class FeedbackDAO {
 
     public boolean addFeedback(Feedback feedback) {
         String sql = "INSERT INTO Feedback (userId,menuItemId, rating, comment, date) VALUES (?, ?, ?, ?, ?)";
-        try (Connection connection = Database.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (Connection connection = Database.getConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setLong(1, feedback.getUserId());
             statement.setLong(2, feedback.getMenuItemId());
@@ -27,12 +26,11 @@ public class FeedbackDAO {
         }
         return false;
     }
+
     public List<Feedback> getAllFeedback() {
         List<Feedback> feedbacks = new ArrayList<>();
         String sql = "SELECT * FROM Feedback";
-        try (Connection connection = Database.getConnection();
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(sql)) {
+        try (Connection connection = Database.getConnection(); Statement statement = connection.createStatement(); ResultSet resultSet = statement.executeQuery(sql)) {
 
             while (resultSet.next()) {
                 long feedbackId = resultSet.getLong("Id");
@@ -42,7 +40,33 @@ public class FeedbackDAO {
                 String comment = resultSet.getString("comment");
                 String date = resultSet.getString("date");
 
-                feedbacks.add(new Feedback( feedbackId,menuItemId, userId, comment, rating,date));
+                feedbacks.add(new Feedback(feedbackId, menuItemId, userId, comment, rating, date));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return feedbacks;
+    }
+    public List<Feedback> getFeedbackForFoodItem(String foodItemName) {
+        List<Feedback> feedbacks = new ArrayList<>();
+        String sql = "SELECT f.* FROM Feedback f " +
+                "JOIN MenuItem m ON f.menuItemId = m.id " +
+                "WHERE m.name = ? AND f.date BETWEEN CURDATE() - INTERVAL 30 DAY AND CURDATE()";
+
+        try (Connection connection = Database.getConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, foodItemName);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    long feedbackId = resultSet.getLong("Id");
+                    long userId = resultSet.getLong("userId");
+                    long menuItemId = resultSet.getLong("menuItemId");
+                    int rating = resultSet.getInt("rating");
+                    String comment = resultSet.getString("comment");
+                    String date = resultSet.getString("date");
+
+                    feedbacks.add(new Feedback(feedbackId, menuItemId, userId, comment, rating, date));
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();

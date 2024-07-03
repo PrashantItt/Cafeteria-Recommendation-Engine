@@ -11,9 +11,7 @@ public class UserActivityDAO {
 
     public List<UserActivity> getAllUserActivities() {
         List<UserActivity> userActivities = new ArrayList<>();
-        try (Connection connection = Database.getConnection();
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery("SELECT * FROM UserActivity")) {
+        try (Connection connection = Database.getConnection(); Statement statement = connection.createStatement(); ResultSet resultSet = statement.executeQuery("SELECT * FROM UserActivity")) {
 
             while (resultSet.next()) {
                 int id = resultSet.getInt("id");
@@ -30,8 +28,7 @@ public class UserActivityDAO {
 
     public UserActivity getUserActivityById(int id) {
         UserActivity userActivity = null;
-        try (Connection connection = Database.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM UserActivity WHERE id = ?")) {
+        try (Connection connection = Database.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM UserActivity WHERE id = ?")) {
 
             preparedStatement.setInt(1, id);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -51,8 +48,7 @@ public class UserActivityDAO {
     }
 
     public boolean addUserActivity(UserActivity userActivity) {
-        try (Connection connection = Database.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO UserActivity (userId, loginTime) VALUES (?, CURRENT_TIMESTAMP)")) {
+        try (Connection connection = Database.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO UserActivity (userId, loginTime) VALUES (?, CURRENT_TIMESTAMP)")) {
 
             preparedStatement.setLong(1, userActivity.getUserId());
             return preparedStatement.executeUpdate() > 0;
@@ -63,8 +59,7 @@ public class UserActivityDAO {
     }
 
     public boolean updateUserActivity(Long userId) {
-        try (Connection connection = Database.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement("UPDATE UserActivity SET logOutTime = CURRENT_TIMESTAMP WHERE userId = ? AND logOutTime IS NULL")) {
+        try (Connection connection = Database.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement("UPDATE UserActivity SET logOutTime = CURRENT_TIMESTAMP WHERE userId = ? AND logOutTime IS NULL")) {
             preparedStatement.setLong(1, userId);
             return preparedStatement.executeUpdate() > 0;
         } catch (SQLException e) {

@@ -14,8 +14,7 @@ public class EmployeeProfileDAO {
 
     public boolean addEmployeeProfile(EmployeeProfile employeeProfile) {
         String sql = "INSERT INTO employeeProfile (userId, name, dietaryPreference, spiceLevel, cuisinePreference, sweetTooth) VALUES (?, ?, ?, ?, ?, ?)";
-        try (Connection connection = Database.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (Connection connection = Database.getConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setLong(1, employeeProfile.getUserId());
             statement.setString(2, employeeProfile.getName());
@@ -33,8 +32,7 @@ public class EmployeeProfileDAO {
 
     public boolean updateEmployeeProfile(EmployeeProfile employeeProfile) {
         String sql = "UPDATE employeeProfile SET name = ?, dietaryPreference = ?, spiceLevel = ?, cuisinePreference = ?, sweetTooth = ? WHERE userId = ?";
-        try (Connection connection = Database.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (Connection connection = Database.getConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setString(1, employeeProfile.getName());
             statement.setString(2, employeeProfile.getDietaryPreference());
@@ -52,8 +50,7 @@ public class EmployeeProfileDAO {
 
     public EmployeeProfile getEmployeeProfile(long userId) {
         String sql = "SELECT * FROM employeeProfile WHERE userId = ?";
-        try (Connection connection = Database.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (Connection connection = Database.getConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setLong(1, userId);
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -76,9 +73,7 @@ public class EmployeeProfileDAO {
     public List<EmployeeProfile> getAllEmployeeProfiles() {
         List<EmployeeProfile> employeeProfiles = new ArrayList<>();
         String sql = "SELECT * FROM employeeProfile";
-        try (Connection connection = Database.getConnection();
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(sql)) {
+        try (Connection connection = Database.getConnection(); Statement statement = connection.createStatement(); ResultSet resultSet = statement.executeQuery(sql)) {
 
             while (resultSet.next()) {
                 long userId = resultSet.getLong("userId");
@@ -98,8 +93,7 @@ public class EmployeeProfileDAO {
 
     public boolean deleteEmployeeProfile(long userId) {
         String sql = "DELETE FROM employeeProfile WHERE userId = ?";
-        try (Connection connection = Database.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (Connection connection = Database.getConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setLong(1, userId);
             return statement.executeUpdate() > 0;

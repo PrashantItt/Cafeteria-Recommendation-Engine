@@ -30,13 +30,16 @@ public class EmployeeController {
                 handleViewRecommendedFood(inputLine,userId);
                 break;
             case "EMPLOYEE_VOTING_INPUT":
-                handleEmployeeVoting(inputLine);
+                handleEmployeeVoting(inputLine,out);
                 break;
             case "EMPLOYEE_CREATE_PROFILE":
                 handleCreateEmployeeProfile(inputLine);
                 break;
             case "EMPLOYEE_UPDATE_PROFILE":
                 handleUpdateEmployeeProfile(inputLine);
+                break;
+            case "EMPLOYEE_VIEW_NOTIFICATION":
+                handleViewNotification(inputLine);
                 break;
             default:
                 out.println("Invalid EMPLOYEE command");
@@ -58,8 +61,8 @@ public class EmployeeController {
         out.println(response);
         out.println("END_OF_MENU");
     }
-    private void handleEmployeeVoting(String request) {
-        employeeService.handleEmployeeVoting(request);
+    private void handleEmployeeVoting(String request,PrintWriter out) {
+        employeeService.handleEmployeeVoting(request,out);
     }
     private void handleCreateEmployeeProfile(String request) {
         String response = employeeService.handleCreateEmployeeProfile(request);
@@ -68,6 +71,10 @@ public class EmployeeController {
 
     private void handleUpdateEmployeeProfile(String request) {
         String response = employeeService.handleUpdateEmployeeProfile(request);
+        out.println(response);
+    }
+    private void handleViewNotification(String request) {
+        String response =employeeService.handleViewNotification(request);
         out.println(response);
     }
 }

@@ -9,11 +9,9 @@ import java.util.List;
 public class FoodItemDAO {
 
     public void addFoodItem(FoodItem foodItem) {
-        String query = "INSERT INTO foodItem (itemName, price, availabilityStatus, foodItemTypeId, dietaryPreference, spiceLevel, cuisinePreference, sweetTooth) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO foodItem (itemName, price, availabilityStatus, foodItemTypeId, dietaryPreference, spiceLevel, cuisinePreference, sweetTooth) " + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try (Connection connection = Database.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+        try (Connection connection = Database.getConnection(); PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, foodItem.getItemName());
             statement.setDouble(2, foodItem.getPrice());
             statement.setBoolean(3, foodItem.isAvailabilityStatus());
@@ -30,8 +28,7 @@ public class FoodItemDAO {
 
     public boolean deleteFoodItem(long foodItemId) {
         String query = "DELETE FROM foodItem WHERE foodItemId = ?";
-        try (Connection connection = Database.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+        try (Connection connection = Database.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
             preparedStatement.setLong(1, foodItemId);
             return preparedStatement.executeUpdate() > 0;
@@ -43,8 +40,7 @@ public class FoodItemDAO {
 
     public boolean updateFoodItem(FoodItem foodItem) {
         String query = "UPDATE foodItem SET itemName = ?, price = ?, availabilityStatus = ?, foodItemTypeId = ?, dietaryPreference = ?, spiceLevel = ?, cuisinePreference = ?, sweetTooth = ? WHERE foodItemId = ?";
-        try (Connection connection = Database.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+        try (Connection connection = Database.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
             preparedStatement.setString(1, foodItem.getItemName());
             preparedStatement.setDouble(2, foodItem.getPrice());
@@ -65,9 +61,7 @@ public class FoodItemDAO {
     public List<FoodItem> getAllFoodItems() {
         List<FoodItem> foodItems = new ArrayList<>();
         String query = "SELECT * FROM foodItem";
-        try (Connection connection = Database.getConnection();
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(query)) {
+        try (Connection connection = Database.getConnection(); Statement statement = connection.createStatement(); ResultSet resultSet = statement.executeQuery(query)) {
 
             while (resultSet.next()) {
                 long foodItemId = resultSet.getLong("foodItemId");
@@ -79,7 +73,7 @@ public class FoodItemDAO {
                 String spiceLevel = resultSet.getString("spiceLevel");
                 String cuisinePreference = resultSet.getString("cuisinePreference");
                 String sweetTooth = resultSet.getString("sweetTooth");
-                foodItems.add(new FoodItem(foodItemId,itemName, price, availabilityStatus, foodItemTypeId, dietaryPreference, spiceLevel, cuisinePreference, sweetTooth));
+                foodItems.add(new FoodItem(foodItemId, itemName, price, availabilityStatus, foodItemTypeId, dietaryPreference, spiceLevel, cuisinePreference, sweetTooth));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -90,8 +84,7 @@ public class FoodItemDAO {
     public FoodItem getFoodItemById(long foodItemId) {
         FoodItem foodItem = null;
         String query = "SELECT * FROM foodItem WHERE foodItemId = ?";
-        try (Connection connection = Database.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+        try (Connection connection = Database.getConnection(); PreparedStatement statement = connection.prepareStatement(query)) {
 
             statement.setLong(1, foodItemId);
 
@@ -109,8 +102,7 @@ public class FoodItemDAO {
                     String cuisinePreference = resultSet.getString("cuisinePreference");
                     String sweetTooth = resultSet.getString("sweetTooth");
 
-                    foodItem = new FoodItem(id, itemName, price, availabilityStatus, foodItemTypeId,averageRating,sentimentComments,
-                            dietaryPreference, spiceLevel, cuisinePreference, sweetTooth);
+                    foodItem = new FoodItem(id, itemName, price, availabilityStatus, foodItemTypeId, averageRating, sentimentComments, dietaryPreference, spiceLevel, cuisinePreference, sweetTooth);
                 }
             }
         } catch (SQLException e) {
@@ -122,8 +114,7 @@ public class FoodItemDAO {
     public FoodItem getFoodItemByName(String itemName) {
         FoodItem foodItem = null;
         String query = "SELECT * FROM foodItem WHERE itemName = ?";
-        try (Connection connection = Database.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+        try (Connection connection = Database.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
             preparedStatement.setString(1, itemName);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -140,10 +131,10 @@ public class FoodItemDAO {
         }
         return foodItem;
     }
+
     public boolean deleteFoodItemByName(String itemName) {
         String query = "DELETE FROM foodItem WHERE itemName = ?";
-        try (Connection connection = Database.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+        try (Connection connection = Database.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
             preparedStatement.setString(1, itemName);
             return preparedStatement.executeUpdate() > 0;
@@ -155,8 +146,7 @@ public class FoodItemDAO {
 
     public boolean updateRatingAndComment(long foodItemId, int avgRating, String sentimentComment) {
         String query = "UPDATE foodItem SET avg_rating = ?, sentiment_comment = ? WHERE foodItemId = ?";
-        try (Connection connection = Database.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+        try (Connection connection = Database.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
             preparedStatement.setInt(1, avgRating);
             preparedStatement.setString(2, sentimentComment);

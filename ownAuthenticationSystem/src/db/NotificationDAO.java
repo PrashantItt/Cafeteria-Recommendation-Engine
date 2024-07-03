@@ -6,15 +6,16 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Date;
+
 import model.Notification;
+
 import java.text.SimpleDateFormat;
 
 public class NotificationDAO {
 
     public boolean sendNotification(Notification notification) {
         String query = "INSERT INTO notification (message, date) VALUES (?, ?)";
-        try (Connection connection = Database.getConnection();
-             PreparedStatement prepStmt = connection.prepareStatement(query)) {
+        try (Connection connection = Database.getConnection(); PreparedStatement prepStmt = connection.prepareStatement(query)) {
             java.sql.Date currentDate = new java.sql.Date(new Date().getTime());
             prepStmt.setString(1, notification.getMessage());
             prepStmt.setDate(2, currentDate);
@@ -27,25 +28,9 @@ public class NotificationDAO {
     }
 
 
-    public boolean updateNotification(Notification notification) {
-        String query = "UPDATE notification SET message = ? WHERE notificationId = ?";
-        try (Connection connection = Database.getConnection();
-             PreparedStatement prepStmt = connection.prepareStatement(query)) {
-
-            prepStmt.setString(1, notification.getMessage());
-            prepStmt.setLong(2, notification.getNotificationId());
-            prepStmt.executeUpdate();
-            return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
     public Notification getNotification(long notificationId) {
         String query = "SELECT * FROM notification WHERE notificationId = ?";
-        try (Connection connection = Database.getConnection();
-             PreparedStatement prepStmt = connection.prepareStatement(query)) {
+        try (Connection connection = Database.getConnection(); PreparedStatement prepStmt = connection.prepareStatement(query)) {
 
             prepStmt.setLong(1, notificationId);
             try (ResultSet resultSet = prepStmt.executeQuery()) {
@@ -65,17 +50,13 @@ public class NotificationDAO {
 
     public List<Notification> getNotificationsByCurrentDate() {
         List<Notification> notifications = new ArrayList<>();
-        String query = "SELECT * FROM notification WHERE date = ?";
+        String query = "SELECT * FROM notification WHERE date = CURDATE()";
 
-        try (Connection connection = Database.getConnection();
-             PreparedStatement prepStmt = connection.prepareStatement(query)) {
-
-            java.sql.Date currentDate = new java.sql.Date(new Date().getTime());
-            prepStmt.setDate(1, currentDate);
+        try (Connection connection = Database.getConnection(); PreparedStatement prepStmt = connection.prepareStatement(query)) {
 
             try (ResultSet resultSet = prepStmt.executeQuery()) {
                 while (resultSet.next()) {
-                    Long id = resultSet.getLong("notificationId"); // Assuming id is an integer
+                    Long id = resultSet.getLong("notificationId");
                     String message = resultSet.getString("message");
                     Date date = resultSet.getDate("date");
 

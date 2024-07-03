@@ -10,15 +10,18 @@ import java.util.Map;
 import java.util.Scanner;
 
 public class EmployeeHandler implements RoleHandler {
-    private Socket socket;
-    private PrintWriter out;
-    private BufferedReader in;
-    private long UserId;
+    private final Socket socket;
+    private final PrintWriter out;
+    private final BufferedReader in;
+    private final Map<Integer, Runnable> menuActions = new HashMap<>();
+    private final Scanner scanner;
 
     public EmployeeHandler(Socket socket, PrintWriter out, BufferedReader in) {
         this.socket = socket;
         this.out = out;
         this.in = in;
+        this.scanner = new Scanner(System.in);
+        initializeMenuActions();
     }
 
     @Override
@@ -26,108 +29,66 @@ public class EmployeeHandler implements RoleHandler {
         showMenu();
     }
 
-    private void showMenu() {
-        Scanner scanner = new Scanner(System.in);
-        int choice;
-        do {
-            System.out.println("Please choose an action:");
-            System.out.println("1. View Menu");
-            System.out.println("2. View Notifications");
-            System.out.println("3. Select Food Items for Tomorrow's Menu");
-            System.out.println("4. Submit Feedback");
-            System.out.println("5. Submit Feedbak For Discard Menu");
-            System.out.println("6. Create Profile");
-            System.out.println("7. Update Profile");
-            System.out.println("0. Exit");
-
-            choice = scanner.nextInt();
-            scanner.nextLine();
-            handleUserChoice(choice, scanner);
-        } while (choice != 0);
-
-        System.out.println("Exiting...");
+    private void initializeMenuActions() {
+        menuActions.put(1, this::viewMenu);
+        menuActions.put(2, this::viewNotifications);
+        menuActions.put(3, this::selectFoodItemsForTomorrow);
+        menuActions.put(4, this::submitFeedback);
+        menuActions.put(5, this::discardMenuFeedback);
+        menuActions.put(6, this::createProfile);
+        menuActions.put(7, this::updateProfile);
     }
 
-    private void handleUserChoice(int choice, Scanner scanner) {
-        switch (choice) {
-            case 1:
-                viewMenu();
-                break;
-            case 2:
-                viewNotifications();
-                break;
-            case 3:
-                selectFoodItemsForTomorrow(scanner);
-                break;
-            case 4:
-                submitFeedback(scanner);
-                break;
-            case 5:
-                discardMenuFeedback(scanner);
-            case 6:
-                createProfile(scanner);
-                break;
-            case 7:
-                updateProfile(scanner);
-                break;
-            case 0:
-                System.out.println("Exiting...");
-                break;
-            default:
-                System.out.println("Invalid choice. Please try again.");
-                break;
-        }
+    private void showMenu() {
+        int choice;
+        do {
+            printMenu();
+            choice = scanner.nextInt();
+            scanner.nextLine();
+            menuActions.getOrDefault(choice, this::invalidChoice).run();
+        } while (choice != 0);
+
+        System.out.println("Logging out...");
+        logout();
+    }
+
+    private void printMenu() {
+        System.out.println("Please choose an action:");
+        System.out.println("1. View Menu");
+        System.out.println("2. View Notifications");
+        System.out.println("3. Select Food Items for Tomorrow's Menu");
+        System.out.println("4. Submit Feedback");
+        System.out.println("5. Submit Feedback For Discard Menu");
+        System.out.println("6. Create Profile");
+        System.out.println("7. Update Profile");
+        System.out.println("0. Logout");
+    }
+
+    private void invalidChoice() {
+        System.out.println("Invalid choice. Please try again.");
     }
 
     private void viewMenu() {
-        out.println("COMMON_VIEW_MENU");
-        try {
-            String response;
-            while ((response = in.readLine()) != null) {
-                System.out.println(response);
-                if (response.equals("END_OF_MENU")) {
-                    break;
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        sendRequest("COMMON_VIEW_MENU");
+        receiveAndPrintResponse("END_OF_MENU");
     }
 
     private void viewNotifications() {
-        out.println("EMPLOYEE_VIEW_NOTIFICATION");
-        try {
-            String response;
-            while ((response = in.readLine()) != null) {
-                System.out.println(response);
-                if (response.equals("END")) {
-                    break;
-                }
-            }
-    }  catch (IOException e) {
-            e.printStackTrace();
-        }
+        sendRequest("EMPLOYEE_VIEW_NOTIFICATION");
+        receiveAndPrintResponse("END_OF_NOTIFICATIONS");
     }
 
-    private void selectFoodItemsForTomorrow(Scanner scanner) {
-        out.println("EMPLOYEE_VIEW_TOMORROW_FOOD");
-        try {
-            String response;
-            while ((response = in.readLine()) != null) {
-                System.out.println(response);
-                if (response.equals("END_OF_MENU")) {
-                    break;
-                }
-            }
-            Map<String, Long> votingInput = VotingForMenu(scanner);
-            out.println("EMPLOYEE_VOTING_INPUT" +"#" + votingInput);
+    private void selectFoodItemsForTomorrow() {
+        sendRequest("EMPLOYEE_VIEW_TOMORROW_FOOD");
+        receiveAndPrintResponse("END_OF_MENU");
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Map<String, Long> votingInput = votingForMenu();
+        out.println("EMPLOYEE_VOTING_INPUT#" + votingInput);
+
+        receiveAndPrintResponse("END_OF_VOTING_PROCESS");
     }
 
-    private Map<String, Long> VotingForMenu(Scanner scanner) {
+    private Map<String, Long> votingForMenu() {
         Map<String, Long> menuVotes = new HashMap<>();
 
         System.out.print("Enter your preferred breakfast item Id: ");
@@ -145,38 +106,29 @@ public class EmployeeHandler implements RoleHandler {
         return menuVotes;
     }
 
+    private void submitFeedback() {
+        System.out.print("Enter your user ID: ");
+        long userId = scanner.nextLong();
+        scanner.nextLine();
 
+        System.out.print("Enter the food item ID: ");
+        long foodItemId = scanner.nextLong();
+        scanner.nextLine();
 
-    private void submitFeedback(Scanner scanner) {
+        System.out.print("Enter your rating (1-5): ");
+        int rating = scanner.nextInt();
+        scanner.nextLine();
 
-            System.out.print("Enter your user ID: ");
-            long userId = scanner.nextLong();
-            scanner.nextLine();
+        System.out.print("Enter your comment: ");
+        String comment = scanner.nextLine().trim();
 
-            System.out.print("Enter the food item ID: ");
-            long foodItemId = scanner.nextLong();
-            scanner.nextLine();
+        String date = LocalDate.now().toString();
 
-            System.out.print("Enter your rating (1-5): ");
-            int rating = scanner.nextInt();
-            scanner.nextLine();
-
-            System.out.print("Enter your comment: ");
-            String comment = scanner.nextLine().trim();
-            System.out.println("Comment" +comment);
-
-            String date = LocalDate.now().toString();
-
-            out.println( "EMPLOYEE_SUBMIT_FEEDBACK "+ "#" + userId + "#" + foodItemId + "#" + rating + "#" + comment + "#" + date);
-        try {
-            String response = in.readLine();
-            System.out.println("Server reply: " + response);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        sendRequest("EMPLOYEE_SUBMIT_FEEDBACK#" + userId + "#" + foodItemId + "#" + rating + "#" + comment + "#" + date);
+        receiveAndPrintSingleResponse();
     }
 
-    private void discardMenuFeedback(Scanner scanner) {
+    private void discardMenuFeedback() {
         System.out.print("Enter the food name: ");
         String foodName = scanner.nextLine().trim();
 
@@ -195,17 +147,11 @@ public class EmployeeHandler implements RoleHandler {
         long userId = scanner.nextLong();
         scanner.nextLine();
 
-
-        out.println("EMPLOYEE_SUBMIT_DISCARD_FEEDBACK" + "#" +userId+"#" + foodName +"#" + dislikeAboutFood + "#" +likeAboutFood +"#"+ momRecipe);
-
-        try {
-            String response = in.readLine();
-            System.out.println("Server reply: " + response);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        sendRequest("EMPLOYEE_SUBMIT_DISCARD_FEEDBACK#" + userId + "#" + foodName + "#" + dislikeAboutFood + "#" + likeAboutFood + "#" + momRecipe);
+        receiveAndPrintSingleResponse();
     }
-    private void createProfile(Scanner scanner) {
+
+    private void createProfile() {
         System.out.print("Enter your user ID: ");
         long userId = scanner.nextLong();
         scanner.nextLine();
@@ -225,17 +171,11 @@ public class EmployeeHandler implements RoleHandler {
         System.out.print("Do you have a sweet tooth? (Yes/No): ");
         String sweetTooth = scanner.nextLine().trim();
 
-        out.println("EMPLOYEE_CREATE_PROFILE" + "#" + userId + "#" + name + "#" + dietaryPreference + "#" + spiceLevel + "#" + cuisinePreference + "#" + sweetTooth);
-
-        try {
-            String response = in.readLine();
-            System.out.println("Server reply: " + response);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        sendRequest("EMPLOYEE_CREATE_PROFILE#" + userId + "#" + name + "#" + dietaryPreference + "#" + spiceLevel + "#" + cuisinePreference + "#" + sweetTooth);
+        receiveAndPrintSingleResponse();
     }
 
-    private void updateProfile(Scanner scanner) {
+    private void updateProfile() {
         System.out.print("Enter your user ID: ");
         long userId = scanner.nextLong();
         scanner.nextLine();
@@ -255,8 +195,34 @@ public class EmployeeHandler implements RoleHandler {
         System.out.print("Update your sweet tooth preference? (Yes/No, press Enter to skip): ");
         String sweetTooth = scanner.nextLine().trim();
 
-        out.println("EMPLOYEE_UPDATE_PROFILE" + "#" + userId + "#" + name + "#" + dietaryPreference + "#" + spiceLevel + "#" + cuisinePreference + "#" + sweetTooth);
+        sendRequest("EMPLOYEE_UPDATE_PROFILE#" + userId + "#" + name + "#" + dietaryPreference + "#" + spiceLevel + "#" + cuisinePreference + "#" + sweetTooth);
+        receiveAndPrintSingleResponse();
+    }
 
+    private void logout() {
+        sendRequest("LOGOUT");
+        receiveAndPrintSingleResponse();
+    }
+
+    private void sendRequest(String request) {
+        out.println(request);
+    }
+
+    private void receiveAndPrintResponse(String endSignal) {
+        try {
+            String response;
+            while ((response = in.readLine()) != null) {
+                System.out.println(response);
+                if (response.equals(endSignal)) {
+                    break;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void receiveAndPrintSingleResponse() {
         try {
             String response = in.readLine();
             System.out.println("Server reply: " + response);
@@ -264,6 +230,4 @@ public class EmployeeHandler implements RoleHandler {
             e.printStackTrace();
         }
     }
-
-
 }
