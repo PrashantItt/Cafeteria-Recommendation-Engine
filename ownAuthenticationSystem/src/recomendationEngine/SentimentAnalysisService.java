@@ -13,7 +13,9 @@ public class SentimentAnalysisService {
                 "delicious", "tasty", "yummy", "scrumptious", "savory",
                 "mouthwatering", "delectable", "flavorful", "succulent", "appetizing",
                 "fresh", "satisfying", "juicy", "tender", "perfect",
-                "heavenly", "divine", "exquisite", "superb", "lovely"
+                "heavenly", "divine", "exquisite", "superb", "lovely",
+                "nutritious", "wholesome", "aromatic", "crispy", "delightful",
+                "golden", "hearty", "luscious", "spicy", "velvety", "well-seasoned"
         };
 
         String[] negativeKeywords = {
@@ -21,7 +23,8 @@ public class SentimentAnalysisService {
                 "bland", "stale", "overcooked", "undercooked", "tasteless",
                 "greasy", "salty", "burnt", "dry", "rubbery",
                 "unappetizing", "disgusting", "soggy", "inedible", "flavorless",
-                "spoiled", "rotten", "bitter", "chewy", "tough"
+                "spoiled", "rotten", "bitter", "chewy", "tough",
+                "cold", "fatty", "mushy", "raw", "unseasoned"
         };
 
         int positiveMatches = countKeywordMatches(comment, positiveKeywords);
@@ -36,7 +39,6 @@ public class SentimentAnalysisService {
 
         return sentimentScore;
     }
-
     private int countKeywordMatches(String comment, String[] keywords) {
         int count = 0;
         for (String keyword : keywords) {

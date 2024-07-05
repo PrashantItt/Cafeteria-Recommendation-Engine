@@ -3,8 +3,6 @@ package server;
 import db.*;
 import model.ChefRecomendationFood;
 import model.DiscardFoodFeedback;
-import model.DiscardFoodItem;
-import model.Feedback;
 import recomendationEngine.RecommendationSystem;
 
 import java.io.BufferedReader;
@@ -23,7 +21,7 @@ public class ChefService {
     }
 
     public String handleFinalizeCreationMenu(String inputLine, PrintWriter out) {
-        String[] menuIds = inputLine.split(" ");
+        String[] menuIds = inputLine.split("#");
         String[] parts = menuIds[1].split(",");
         boolean allFoodsAdded = true;
 
@@ -51,8 +49,9 @@ public class ChefService {
 
 
     public void handleRoleItemMenu(String arguments, PrintWriter out) throws SQLException {
+        String[] splitString = arguments.split("#");
         RecommendationSystem recommendationSystem = new RecommendationSystem();
-        Map<String, List<Map<String, Object>>> top3FoodItemsByCategory = recommendationSystem.getTop3FoodItemsByCategory();
+        Map<String, List<Map<String, Object>>> top3FoodItemsByCategory = recommendationSystem.getTopFoodItemsByCategory(splitString[1]);
         for (Map.Entry<String, List<Map<String, Object>>> categoryEntry : top3FoodItemsByCategory.entrySet()) {
             String category = categoryEntry.getKey();
             List<Map<String, Object>> top3Items = categoryEntry.getValue();
@@ -167,7 +166,7 @@ public class ChefService {
     }
 
     public void handleDisplayDiscardMenuList(String inputLine, PrintWriter out) {
-        String[] parts = inputLine.split(" ");
+        String[] parts = inputLine.split("#");
         if (parts.length < 2) {
             out.println("Invalid input format. Please provide food name.");
             out.println("END_OF_MENU");

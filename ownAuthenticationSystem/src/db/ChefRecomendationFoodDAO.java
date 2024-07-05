@@ -30,7 +30,8 @@ public class ChefRecomendationFoodDAO {
         List<FoodItem> recommendedFoodItems = new ArrayList<>();
         String query = "SELECT fi.foodItemId, fi.itemName, fi.price, fi.avg_rating, fi.sentiment_comment, fi.foodItemTypeId " + "FROM chefrecomendationfood crf " + "JOIN fooditem fi ON crf.foodItemId = fi.foodItemId " + "WHERE crf.Date = CURDATE()";
 
-        try (Connection connection = Database.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(query); ResultSet resultSet = preparedStatement.executeQuery()) {
+        try (Connection connection = Database.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(query);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
 
             while (resultSet.next()) {
                 long foodItemId = resultSet.getLong("foodItemId");

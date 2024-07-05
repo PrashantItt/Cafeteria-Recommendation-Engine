@@ -36,7 +36,7 @@ public class ChefHandler implements RoleHandler {
         menuActions.put(5, this::getAllFeedbackByFoodName);
     }
 
-    private void showMenu() throws IOException {
+    private void showMenu() {
         int choice;
         do {
             printMenu();
@@ -64,14 +64,16 @@ public class ChefHandler implements RoleHandler {
     }
 
     private void rollOutMenuForNextDay() {
-        sendRequest("CHEF_ROLL_OUT_MENU");
+        System.out.print("Enter the number of Items you want to view recommendation : ");
+        String numberOfItems = scanner.nextLine();
+        sendRequest("CHEF_ROLL_OUT_MENU"+"#"+ numberOfItems);
         receiveAndPrintResponse("END_OF_MENU");
     }
 
     private void finalizeMenuForNextDay() {
         System.out.print("Enter the MenuId for the next day (comma separated Id): ");
         String menuIds = scanner.nextLine();
-        sendRequest("CHEF_FINALIZE_MENU " + menuIds);
+        sendRequest("CHEF_FINALIZE_MENU"+"#"+ menuIds);
         receiveAndPrintSingleResponse();
     }
 
@@ -106,7 +108,7 @@ public class ChefHandler implements RoleHandler {
         sendRequest("REMOVE_FOOD_ITEM");
         System.out.print("Enter the name of the food item to be removed from the menu: ");
         String foodItemName = scanner.nextLine().trim();
-        sendRequest("foodName " + foodItemName);
+        sendRequest("foodName " +"#"+ foodItemName);
         receiveAndPrintResponse("End of Response");
     }
 
@@ -121,7 +123,7 @@ public class ChefHandler implements RoleHandler {
     private void getAllFeedbackByFoodName() {
         System.out.print("Enter the name of the food item to view all feedback: ");
         String foodItemName = scanner.nextLine().trim();
-        sendRequest("CHEF_GET_ALL_FEEDBACK_BY_FOOD_NAME" + " " + foodItemName);
+        sendRequest("CHEF_GET_ALL_FEEDBACK_BY_FOOD_NAME" + "#" + foodItemName);
         receiveAndPrintResponse("END_OF_FEEDBACK");
     }
 

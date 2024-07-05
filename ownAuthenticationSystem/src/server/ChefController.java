@@ -18,7 +18,7 @@ public class ChefController {
     }
 
     public void processCommand(String inputLine) throws SQLException, IOException {
-        String[] parts = inputLine.split(" ");
+        String[] parts = inputLine.split("#");
         System.out.println("Input" + inputLine);
         System.out.println("Parts" +parts[0]);
 

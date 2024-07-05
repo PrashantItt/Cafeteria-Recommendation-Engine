@@ -27,9 +27,9 @@ public class RecommendationSystem {
         this.foodItemTypeDAO = new FoodItemTypeDAO();
     }
 
-    public Map<String, List<Map<String, Object>>> getTop3FoodItemsByCategory() {
+    public Map<String, List<Map<String, Object>>> getTopFoodItemsByCategory(String numberOfItems) {
         Map<Long, Map<String, Object>> menuItems = calculateSentimentScores();
-        return extractTop3FoodItemsByCategory(menuItems);
+        return extractTopFoodItemsByCategory(menuItems,numberOfItems);
     }
 
     public List<Map<String, Object>> getLowRatedFoodItems() {
@@ -108,8 +108,9 @@ public class RecommendationSystem {
         System.out.println("response: " + response);
     }
 
-    private Map<String, List<Map<String, Object>>> extractTop3FoodItemsByCategory(Map<Long, Map<String, Object>> menuItems) {
-        Map<String, List<Map<String, Object>>> top3FoodItemsByCategory = new HashMap<>();
+    private Map<String, List<Map<String, Object>>> extractTopFoodItemsByCategory(Map<Long, Map<String, Object>> menuItems, String numberOfItems) {
+        Map<String, List<Map<String, Object>>> topFoodItemsByCategory = new HashMap<>();
+        int numberOfFood = Integer.parseInt(numberOfItems);
 
         for (Map.Entry<Long, Map<String, Object>> entry : menuItems.entrySet()) {
             Long menuItemId = entry.getKey();
@@ -117,13 +118,13 @@ public class RecommendationSystem {
 
             String category = determineCategory(menuItemId);
             details.put("Id", menuItemId);
-            top3FoodItemsByCategory.computeIfAbsent(category, k -> new ArrayList<>()).add(details);
+            topFoodItemsByCategory.computeIfAbsent(category, k -> new ArrayList<>()).add(details);
         }
 
-        for (String category : top3FoodItemsByCategory.keySet()) {
-            List<Map<String, Object>> sortedList = top3FoodItemsByCategory.get(category).stream()
+        for (String category : topFoodItemsByCategory.keySet()) {
+            List<Map<String, Object>> sortedList = topFoodItemsByCategory.get(category).stream()
                     .sorted((e1, e2) -> Double.compare((Double) e2.get("CompositeScore"), (Double) e1.get("CompositeScore")))
-                    .limit(3)
+                    .limit(numberOfFood)
                     .collect(Collectors.toList());
 
             List<Map<String, Object>> top3Items = new ArrayList<>();
@@ -136,10 +137,10 @@ public class RecommendationSystem {
                 }
             }
 
-            top3FoodItemsByCategory.put(category, top3Items);
+            topFoodItemsByCategory.put(category, top3Items);
         }
 
-        return top3FoodItemsByCategory;
+        return topFoodItemsByCategory;
     }
 
     private List<Map<String, Object>> extractLowRatedFoodItems(Map<Long, Map<String, Object>> menuItems) {
