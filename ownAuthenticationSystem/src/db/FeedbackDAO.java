@@ -74,5 +74,23 @@ public class FeedbackDAO {
         return feedbacks;
     }
 
+    public boolean feedbackExists(long userId, long menuItemId, String date) {
+        String query = "SELECT COUNT(*) FROM feedback WHERE userId = ? AND menuItemId = ? AND date = ?";
+        try (Connection conn = Database.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setLong(1, userId);
+            stmt.setLong(2, menuItemId);
+            stmt.setString(3, date);
+
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
 
 }

@@ -14,9 +14,7 @@ public class EmployeeController {
 
     public void processCommand(String inputLine,long userId) {
         String[] parts = inputLine.split("#");
-        System.out.println(parts.length);
         String command = parts[0];
-        System.out.println(command);
         String arguments = inputLine.substring(command.length()).trim();
         System.out.println("arguments" +arguments);
         switch (command) {

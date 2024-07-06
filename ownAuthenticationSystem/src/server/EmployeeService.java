@@ -22,9 +22,12 @@ public class EmployeeService {
                 System.out.println("comment" +comment);
                 String date = parts[5];
 
-                Feedback feedback = new Feedback(menuItemId, userId, comment, rating, date);
-
                 FeedbackDAO feedbackDAO = new FeedbackDAO();
+                if (feedbackDAO.feedbackExists(userId, menuItemId, date)) {
+                    return "ERROR_FEEDBACK_ALREADY_EXISTS";
+                }
+
+                Feedback feedback = new Feedback(menuItemId, userId, comment, rating, date);
                 boolean feedbackAdded = feedbackDAO.addFeedback(feedback);
 
                 if (feedbackAdded) {

@@ -16,7 +16,6 @@ public class CommonController {
 
     public void processCommand(String inputLine) {
         String[] parts = inputLine.split(" ");
-        System.out.println(parts[0]);
 
         switch (parts[0]) {
             case "COMMON_VIEW_MENU":
@@ -25,7 +24,6 @@ public class CommonController {
             default:
                 out.println("Invalid CHEF command");
         }
-
     }
 
     private void handleViewMenu() {
