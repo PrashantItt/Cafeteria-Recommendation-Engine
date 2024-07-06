@@ -12,7 +12,6 @@ public class EmployeeService {
 
     public String handleSubmitFeedback(String inputLine) {
         String[] parts = inputLine.split("#");
-        System.out.println("parts" +parts);
         if (parts.length == 6) {
             try {
                 long userId = Long.parseLong(parts[1]);

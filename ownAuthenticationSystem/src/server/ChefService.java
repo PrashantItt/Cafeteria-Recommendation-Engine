@@ -21,31 +21,46 @@ public class ChefService {
     }
 
     public String handleFinalizeCreationMenu(String inputLine, PrintWriter out) {
+        if (chefRecomendationFoodDAO.entryExistsForToday()) {
+            return "An entry for today already exists. Only one entry per day is allowed.";
+        }
+
         String[] menuIds = inputLine.split("#");
-        String[] parts = menuIds[1].split(",");
+        if (menuIds.length < 2) {
+            return "Invalid input format.";
+        }
+
+        String[] foodIds = menuIds[1].split(",");
+        if (foodIds.length < 3) {
+            return "Please enter a minimum of three items for the Chef's Recommendation.";
+        }
+
+        boolean allFoodsAdded = addFoodsToRecommendation(foodIds, out);
+
+        return allFoodsAdded ? "Chef Recommendation Food Added Successfully" : "Failed to add some or all Chef Recommendation Food";
+    }
+
+    private boolean addFoodsToRecommendation(String[] foodIds, PrintWriter out) {
         boolean allFoodsAdded = true;
 
-        for (int index = 0; index < parts.length; index++) {
-            String foodIdStr = parts[index].trim();
+        for (String foodIdStr : foodIds) {
+            String trimmedFoodId = foodIdStr.trim();
             try {
-                Long foodItemId = Long.parseLong(foodIdStr);
+                Long foodItemId = Long.parseLong(trimmedFoodId);
                 ChefRecomendationFood chefRecomendationFood = new ChefRecomendationFood(foodItemId);
                 boolean foodAdded = chefRecomendationFoodDAO.insert(chefRecomendationFood);
                 if (!foodAdded) {
                     allFoodsAdded = false;
                 }
             } catch (NumberFormatException e) {
-                out.println("Invalid food ID format: " + foodIdStr);
+                out.println("Invalid food ID format: " + trimmedFoodId);
                 allFoodsAdded = false;
             }
         }
 
-        if (allFoodsAdded) {
-            return "Chef Recommendation Food Added Successfully";
-        } else {
-            return "Failed to add some or all Chef Recommendation Food";
-        }
+        return allFoodsAdded;
     }
+
 
 
     public void handleRoleItemMenu(String arguments, PrintWriter out) throws SQLException {

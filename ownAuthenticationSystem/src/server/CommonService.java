@@ -4,10 +4,6 @@ import db.FoodItemDAO;
 import db.FoodItemTypeDAO;
 import model.FoodItem;
 import model.FoodItemType;
-import service.UserService;
-
-import java.io.PrintWriter;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

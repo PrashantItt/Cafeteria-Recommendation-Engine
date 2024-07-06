@@ -85,6 +85,18 @@ public class ChefRecomendationFoodDAO {
         }
         return topFoodItems;
     }
+    public boolean entryExistsForToday() {
+        String query = "SELECT COUNT(*) FROM chefRecomendationFood WHERE `Date` = CURDATE()";
+        try (Connection connection = Database.getConnection(); PreparedStatement stmt = connection.prepareStatement(query)) {
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 
 }
 
