@@ -87,8 +87,11 @@ public class AdminService {
 
                 FoodItem foodItem = new FoodItem(itemName, price, availabilityStatus, foodItemTypeId, dietaryPreference, spiceLevel, cuisinePreference, sweetTooth);
                 FoodItemDAO foodItemDAO = new FoodItemDAO();
-                foodItemDAO.addFoodItem(foodItem);
-                return "Menu item added successfully";
+                boolean result = foodItemDAO.addFoodItem(foodItem);
+                if(result) {
+                    return "Menu item added successfully";
+                }
+                return "Failed to Add Menu Item";
             } catch (NumberFormatException e) {
                 return "Error adding menu item";
             }

@@ -8,7 +8,7 @@ import java.util.List;
 
 public class FoodItemDAO {
 
-    public void addFoodItem(FoodItem foodItem) {
+    public boolean addFoodItem(FoodItem foodItem) {
         String query = "INSERT INTO foodItem (itemName, price, availabilityStatus, foodItemTypeId, dietaryPreference, spiceLevel, cuisinePreference, sweetTooth) " + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection connection = Database.getConnection(); PreparedStatement statement = connection.prepareStatement(query)) {
@@ -20,10 +20,11 @@ public class FoodItemDAO {
             statement.setString(6, foodItem.getSpiceLevel());
             statement.setString(7, foodItem.getCuisinePreference());
             statement.setString(8, foodItem.getSweetTooth());
-            statement.executeUpdate();
+            return statement.executeUpdate() >0;
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return false;
     }
 
     public boolean deleteFoodItem(long foodItemId) {

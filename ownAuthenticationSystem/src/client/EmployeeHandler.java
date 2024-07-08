@@ -90,113 +90,134 @@ public class EmployeeHandler implements RoleHandler {
 
     private Map<String, Long> votingForMenu() {
         Map<String, Long> menuVotes = new HashMap<>();
+        try {
+            System.out.print("Enter your preferred breakfast item Id: ");
+            Long breakfast = scanner.nextLong();
+            menuVotes.put("Breakfast", breakfast);
 
-        System.out.print("Enter your preferred breakfast item Id: ");
-        Long breakfast = scanner.nextLong();
-        menuVotes.put("Breakfast", breakfast);
+            System.out.print("Enter your preferred lunch item: ");
+            Long lunch = scanner.nextLong();
+            menuVotes.put("Lunch", lunch);
 
-        System.out.print("Enter your preferred lunch item: ");
-        Long lunch = scanner.nextLong();
-        menuVotes.put("Lunch", lunch);
+            System.out.print("Enter your preferred dinner item: ");
+            Long dinner = scanner.nextLong();
+            menuVotes.put("Dinner", dinner);
 
-        System.out.print("Enter your preferred dinner item: ");
-        Long dinner = scanner.nextLong();
-        menuVotes.put("Dinner", dinner);
-
+            return menuVotes;
+        } catch (NumberFormatException e) {
+            handleInvalidInput("Invalid input. Please enter the correct values.");
+        }
         return menuVotes;
     }
 
     private void submitFeedback() {
-        System.out.print("Enter your user ID: ");
-        long userId = scanner.nextLong();
-        scanner.nextLine();
+        try {
+            System.out.print("Enter your user ID: ");
+            long userId = scanner.nextLong();
+            scanner.nextLine();
 
-        System.out.print("Enter the food item ID: ");
-        long foodItemId = scanner.nextLong();
-        scanner.nextLine();
+            System.out.print("Enter the food item ID: ");
+            long foodItemId = scanner.nextLong();
+            scanner.nextLine();
 
-        System.out.print("Enter your rating (1-5): ");
-        int rating = scanner.nextInt();
-        scanner.nextLine();
+            System.out.print("Enter your rating (1-5): ");
+            int rating = scanner.nextInt();
+            scanner.nextLine();
 
-        System.out.print("Enter your comment: ");
-        String comment = scanner.nextLine().trim();
+            System.out.print("Enter your comment: ");
+            String comment = scanner.nextLine().trim();
 
-        String date = LocalDate.now().toString();
+            String date = LocalDate.now().toString();
 
-        sendRequest("EMPLOYEE_SUBMIT_FEEDBACK#" + userId + "#" + foodItemId + "#" + rating + "#" + comment + "#" + date);
-        receiveAndPrintSingleResponse();
+            sendRequest("EMPLOYEE_SUBMIT_FEEDBACK#" + userId + "#" + foodItemId + "#" + rating + "#" + comment + "#" + date);
+            receiveAndPrintSingleResponse();
+        } catch (NumberFormatException e) {
+            handleInvalidInput("Invalid input. Please enter the correct values.");
+        }
     }
 
     private void discardMenuFeedback() {
-        System.out.print("Enter the food name: ");
-        String foodName = scanner.nextLine().trim();
+        try {
+            System.out.print("Enter the food name: ");
+            String foodName = scanner.nextLine().trim();
 
-        System.out.println("We are trying to improve your experience with " + foodName + ". Please provide your feedback and help us.");
+            System.out.println("We are trying to improve your experience with " + foodName + ". Please provide your feedback and help us.");
 
-        System.out.print("Q1. What didn’t you like about " + foodName + "? ");
-        String dislikeAboutFood = scanner.nextLine().trim();
+            System.out.print("Q1. What didn’t you like about " + foodName + "? ");
+            String dislikeAboutFood = scanner.nextLine().trim();
 
-        System.out.print("Q2. How would you like " + foodName + " to taste? ");
-        String likeAboutFood = scanner.nextLine().trim();
+            System.out.print("Q2. How would you like " + foodName + " to taste? ");
+            String likeAboutFood = scanner.nextLine().trim();
 
-        System.out.print("Q3. Share your mom’s recipe: ");
-        String momRecipe = scanner.nextLine().trim();
+            System.out.print("Q3. Share your mom’s recipe: ");
+            String momRecipe = scanner.nextLine().trim();
 
-        System.out.print("Enter your user ID: ");
-        long userId = scanner.nextLong();
-        scanner.nextLine();
+            System.out.print("Enter your user ID: ");
+            long userId = scanner.nextLong();
+            scanner.nextLine();
 
-        sendRequest("EMPLOYEE_SUBMIT_DISCARD_FEEDBACK#" + userId + "#" + foodName + "#" + dislikeAboutFood + "#" + likeAboutFood + "#" + momRecipe);
-        receiveAndPrintSingleResponse();
+            sendRequest("EMPLOYEE_SUBMIT_DISCARD_FEEDBACK#" + userId + "#" + foodName + "#" + dislikeAboutFood + "#" + likeAboutFood + "#" + momRecipe);
+            receiveAndPrintSingleResponse();
+        } catch (NumberFormatException e) {
+            handleInvalidInput("Invalid input. Please enter the correct values.");
+        }
     }
 
     private void createProfile() {
-        System.out.print("Enter your user ID: ");
-        long userId = scanner.nextLong();
-        scanner.nextLine();
+        try {
+            System.out.print("Enter your user ID: ");
+            long userId = scanner.nextLong();
+            scanner.nextLine();
 
-        System.out.print("Enter your name: ");
-        String name = scanner.nextLine().trim();
+            System.out.print("Enter your name: ");
+            String name = scanner.nextLine().trim();
 
-        System.out.print("Enter your dietary preference (Vegetarian/Non Vegetarian/Eggetarian): ");
-        String dietaryPreference = scanner.nextLine().trim();
+            System.out.print("Enter your dietary preference (Vegetarian/Non Vegetarian/Eggetarian): ");
+            String dietaryPreference = scanner.nextLine().trim();
 
-        System.out.print("Enter your spice level preference (High/Medium/Low): ");
-        String spiceLevel = scanner.nextLine().trim();
+            System.out.print("Enter your spice level preference (High/Medium/Low): ");
+            String spiceLevel = scanner.nextLine().trim();
 
-        System.out.print("Enter your cuisine preference (North Indian/South Indian/Other): ");
-        String cuisinePreference = scanner.nextLine().trim();
+            System.out.print("Enter your cuisine preference (North Indian/South Indian/Other): ");
+            String cuisinePreference = scanner.nextLine().trim();
 
-        System.out.print("Do you have a sweet tooth? (Yes/No): ");
-        String sweetTooth = scanner.nextLine().trim();
+            System.out.print("Do you have a sweet tooth? (Yes/No): ");
+            String sweetTooth = scanner.nextLine().trim();
 
-        sendRequest("EMPLOYEE_CREATE_PROFILE#" + userId + "#" + name + "#" + dietaryPreference + "#" + spiceLevel + "#" + cuisinePreference + "#" + sweetTooth);
-        receiveAndPrintSingleResponse();
+            sendRequest("EMPLOYEE_CREATE_PROFILE#" + userId + "#" + name + "#" + dietaryPreference + "#" + spiceLevel + "#" + cuisinePreference + "#" + sweetTooth);
+            receiveAndPrintSingleResponse();
+        } catch (NumberFormatException e) {
+            handleInvalidInput("Invalid input. Please enter the correct values.");
+        }
     }
 
     private void updateProfile() {
-        System.out.print("Enter your user ID: ");
-        long userId = scanner.nextLong();
-        scanner.nextLine();
+        try {
+            System.out.print("Enter your user ID: ");
+            long userId = scanner.nextLong();
+            scanner.nextLine();
 
-        System.out.print("Enter your updated name (press Enter to skip): ");
-        String name = scanner.nextLine().trim();
+            System.out.print("Enter your updated name (press Enter to skip): ");
+            String name = scanner.nextLine().trim();
 
-        System.out.print("Enter your updated dietary preference (press Enter to skip): ");
-        String dietaryPreference = scanner.nextLine().trim();
+            System.out.print("Enter your updated dietary preference (press Enter to skip): ");
+            String dietaryPreference = scanner.nextLine().trim();
 
-        System.out.print("Enter your updated spice level preference (press Enter to skip): ");
-        String spiceLevel = scanner.nextLine().trim();
+            System.out.print("Enter your updated spice level preference (press Enter to skip): ");
+            String spiceLevel = scanner.nextLine().trim();
 
-        System.out.print("Enter your updated cuisine preference (press Enter to skip): ");
-        String cuisinePreference = scanner.nextLine().trim();
+            System.out.print("Enter your updated cuisine preference (press Enter to skip): ");
+            String cuisinePreference = scanner.nextLine().trim();
 
-        System.out.print("Update your sweet tooth preference? (Yes/No, press Enter to skip): ");
-        String sweetTooth = scanner.nextLine().trim();
+            System.out.print("Update your sweet tooth preference? (Yes/No, press Enter to skip): ");
+            String sweetTooth = scanner.nextLine().trim();
 
-        sendRequest("EMPLOYEE_UPDATE_PROFILE#" + userId + "#" + name + "#" + dietaryPreference + "#" + spiceLevel + "#" + cuisinePreference + "#" + sweetTooth);
-        receiveAndPrintSingleResponse();
+            sendRequest("EMPLOYEE_UPDATE_PROFILE#" + userId + "#" + name + "#" + dietaryPreference + "#" + spiceLevel + "#" + cuisinePreference + "#" + sweetTooth);
+            receiveAndPrintSingleResponse();
+        } catch (NumberFormatException e) {
+            handleInvalidInput("Invalid input. Please enter the correct values.");
+        }
+
     }
 
     private void logout() {
@@ -229,5 +250,9 @@ public class EmployeeHandler implements RoleHandler {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void handleInvalidInput(String message) {
+        System.out.println(message);
     }
 }

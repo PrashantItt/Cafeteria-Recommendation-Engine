@@ -1,6 +1,5 @@
 package recomendationEngine;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +12,7 @@ import db.FoodItemTypeDAO;
 import model.Feedback;
 import model.FoodItem;
 import model.FoodItemType;
+import model.SentimentResult;
 
 public class RecommendationSystem {
     private FeedbackDAO feedbackDAO;
@@ -20,7 +20,7 @@ public class RecommendationSystem {
     private FoodItemDAO foodItemDAO;
     private FoodItemTypeDAO foodItemTypeDAO;
 
-    public RecommendationSystem() throws SQLException {
+    public RecommendationSystem() {
         this.feedbackDAO = new FeedbackDAO();
         this.sentimentService = new SentimentAnalysisService();
         this.foodItemDAO = new FoodItemDAO();
@@ -29,7 +29,7 @@ public class RecommendationSystem {
 
     public Map<String, List<Map<String, Object>>> getTopFoodItemsByCategory(String numberOfItems) {
         Map<Long, Map<String, Object>> menuItems = calculateSentimentScores();
-        return extractTopFoodItemsByCategory(menuItems,numberOfItems);
+        return extractTopFoodItemsByCategory(menuItems, numberOfItems);
     }
 
     public List<Map<String, Object>> getLowRatedFoodItems() {
@@ -49,7 +49,7 @@ public class RecommendationSystem {
             Map<String, Object> menuItemDetails = processFeedbacksAndGetDetails(feedbacks);
             menuItems.put(menuItemId, menuItemDetails);
 
-            storeRatingAndCommentInMenu(menuItemId, (double) menuItemDetails.get("AverageRating"), (String) menuItemDetails.get("CombinedComments"));
+            storeRatingAndCommentInMenu(menuItemId, (double) menuItemDetails.get("AverageRating"), (String) menuItemDetails.get("SentimentComment"));
         }
 
         return menuItems;
@@ -75,32 +75,18 @@ public class RecommendationSystem {
         }
 
         double averageRating = totalRating / count;
-        double sentimentScore = sentimentService.analyzeSentiment(combinedComments.toString().trim());
-        double normalizedSentimentScore = sentimentScore * 5;
+        SentimentResult sentimentResult = sentimentService.analyzeSentiment(combinedComments.toString().trim());
+        double normalizedSentimentScore = sentimentResult.getSentimentScore() * 5;
 
         double compositeScore = 0.5 * averageRating + 0.5 * normalizedSentimentScore;
         compositeScore = Math.max(1, Math.min(5, compositeScore));
 
         Map<String, Object> menuItemDetails = new HashMap<>();
         menuItemDetails.put("CompositeScore", compositeScore);
-        menuItemDetails.put("CombinedComments", generateSentimentComment(compositeScore));
+        menuItemDetails.put("SentimentComment", sentimentResult.getSentimentComment());
         menuItemDetails.put("AverageRating", averageRating);
 
         return menuItemDetails;
-    }
-
-    private String generateSentimentComment(double normalizedScore) {
-        if (normalizedScore >= 4.0) {
-            return "Excellent";
-        } else if (normalizedScore >= 3.0) {
-            return "Good";
-        } else if (normalizedScore >= 2.0) {
-            return "Average";
-        } else if (normalizedScore >= 1.0) {
-            return "Poor";
-        } else {
-            return " ";
-        }
     }
 
     private void storeRatingAndCommentInMenu(Long menuItemId, double averageRating, String sentimentComment) {
@@ -127,17 +113,17 @@ public class RecommendationSystem {
                     .limit(numberOfFood)
                     .collect(Collectors.toList());
 
-            List<Map<String, Object>> top3Items = new ArrayList<>();
+            List<Map<String, Object>> topItems = new ArrayList<>();
             for (Map<String, Object> item : sortedList) {
                 Long menuItemId = (Long) item.get("Id");
                 FoodItem foodItem = foodItemDAO.getFoodItemById(menuItemId);
                 if (foodItem != null) {
                     Map<String, Object> itemDetails = createFoodItemDetails(foodItem, item);
-                    top3Items.add(itemDetails);
+                    topItems.add(itemDetails);
                 }
             }
 
-            topFoodItemsByCategory.put(category, top3Items);
+            topFoodItemsByCategory.put(category, topItems);
         }
 
         return topFoodItemsByCategory;
@@ -146,13 +132,18 @@ public class RecommendationSystem {
     private List<Map<String, Object>> extractLowRatedFoodItems(Map<Long, Map<String, Object>> menuItems) {
         List<Map<String, Object>> lowRatedFoodItems = new ArrayList<>();
 
+        SentimentAnalysisService sentimentService = new SentimentAnalysisService();
+
         for (Map.Entry<Long, Map<String, Object>> entry : menuItems.entrySet()) {
             Map<String, Object> details = entry.getValue();
-            double compositeScore = (double) details.get("CompositeScore");
-            String sentimentComment = details.get("CombinedComments").toString();
+            double averageRating = (double) details.get("AverageRating");
+            System.out.println(averageRating);
+            String sentimentComment = (String) details.get("SentimentComment");
+            System.out.println(sentimentComment);
 
-            if (compositeScore < 2.0 && ("Average".equals(sentimentComment) || "Poor".equals(sentimentComment))) {
-                FoodItem foodItem = foodItemDAO.getFoodItemById(entry.getKey());
+            if (averageRating < 2.0 && sentimentService.containsNegativeKeywords(sentimentComment)) {
+                Long menuItemId = entry.getKey();
+                FoodItem foodItem = foodItemDAO.getFoodItemById(menuItemId);
                 if (foodItem != null) {
                     Map<String, Object> itemDetails = createFoodItemDetails(foodItem, details);
                     lowRatedFoodItems.add(itemDetails);
@@ -170,7 +161,7 @@ public class RecommendationSystem {
         itemDetails.put("Price", foodItem.getPrice());
         itemDetails.put("CompositeScore", details.get("CompositeScore"));
         itemDetails.put("AverageRating", details.get("AverageRating"));
-        itemDetails.put("SentimentComment", details.get("CombinedComments"));
+        itemDetails.put("SentimentComment", details.get("SentimentComment"));
         return itemDetails;
     }
 

@@ -42,9 +42,13 @@ public class AdminHandler implements RoleHandler {
         int choice;
         do {
             printMenu();
-            choice = scanner.nextInt();
-            scanner.nextLine();
-            menuActions.getOrDefault(choice, this::invalidChoice).run();
+            try {
+                choice = Integer.parseInt(scanner.nextLine());
+                menuActions.getOrDefault(choice, this::invalidChoice).run();
+            } catch (NumberFormatException e) {
+                handleInvalidInput("Invalid input. Please enter a number.");
+                choice = -1;
+            }
         } while (choice != 0);
 
         System.out.println("Logging out...");
@@ -68,135 +72,167 @@ public class AdminHandler implements RoleHandler {
     }
 
     private void addUsers() {
-        System.out.print("Enter new user's username: ");
-        String username = scanner.nextLine();
-        System.out.print("Enter new user's password: ");
-        String password = scanner.nextLine();
-        System.out.println("Enter the RoleID");
-        Long roleId = scanner.nextLong();
+        try {
+            System.out.print("Enter new user's username: ");
+            String username = scanner.nextLine();
+            System.out.print("Enter new user's password: ");
+            String password = scanner.nextLine();
+            System.out.print("Enter the RoleID: ");
+            Long roleId = Long.parseLong(scanner.nextLine());
 
-        sendRequest("ADMIN_ADD_USER#" + username + "#" + password + "#" + roleId);
-        receiveAndPrintSingleResponse();
+            sendRequest("ADMIN_ADD_USER#" + username + "#" + password + "#" + roleId);
+            receiveAndPrintSingleResponse();
+        } catch (NumberFormatException e) {
+            handleInvalidInput("Invalid RoleID. Please enter a valid number.");
+        } catch (IOException e) {
+            handleServerCommunicationError(e);
+        }
     }
 
     private void updateUsers() {
-        System.out.print("Enter the username of the user to update: ");
-        String username = scanner.nextLine();
-        System.out.print("Enter new password: ");
-        String newPassword = scanner.nextLine();
-        System.out.print("Enter new RoleID: ");
-        Long newRoleId = scanner.nextLong();
-        scanner.nextLine();
+        try {
+            System.out.print("Enter the username of the user to update: ");
+            String username = scanner.nextLine();
+            System.out.print("Enter new password: ");
+            String newPassword = scanner.nextLine();
+            System.out.print("Enter new RoleID: ");
+            Long newRoleId = Long.parseLong(scanner.nextLine());
 
-        sendRequest("ADMIN_UPDATE_USER#" + username + "#" + newPassword + "#" + newRoleId);
-        receiveAndPrintSingleResponse();
+            sendRequest("ADMIN_UPDATE_USER#" + username + "#" + newPassword + "#" + newRoleId);
+            receiveAndPrintSingleResponse();
+        } catch (NumberFormatException e) {
+            handleInvalidInput("Invalid RoleID. Please enter a valid number.");
+        } catch (IOException e) {
+            handleServerCommunicationError(e);
+        }
     }
 
     private void deleteUsers() {
-        System.out.print("Enter the username of the user to delete: ");
-        String username = scanner.nextLine();
+        try {
+            System.out.print("Enter the username of the user to delete: ");
+            String username = scanner.nextLine();
 
-        sendRequest("ADMIN_DELETE_USER#" + username);
-        receiveAndPrintSingleResponse();
+            sendRequest("ADMIN_DELETE_USER#" + username);
+            receiveAndPrintSingleResponse();
+        } catch (IOException e) {
+            handleServerCommunicationError(e);
+        }
     }
 
     private void addMenuItems() {
-        System.out.print("Enter item name: ");
-        String itemName = scanner.nextLine();
-        System.out.print("Enter item price: ");
-        double price = scanner.nextDouble();
-        scanner.nextLine();
-        System.out.print("Enter availability status (true/false): ");
-        boolean availabilityStatus = scanner.nextBoolean();
-        scanner.nextLine();
-        System.out.print("Enter food item type ID: ");
-        long foodItemTypeId = scanner.nextLong();
-        scanner.nextLine();
-        System.out.print("Select dietary preference (Vegetarian/Non Vegetarian/Eggetarian): ");
-        String dietaryPreference = scanner.nextLine();
-        System.out.print("Select spice level (High/Medium/Low): ");
-        String spiceLevel = scanner.nextLine();
-        System.out.print("Select cuisine preference (North Indian/South Indian/Other): ");
-        String cuisinePreference = scanner.nextLine();
-        System.out.print("Do you have a sweet tooth? (Yes/No): ");
-        String sweetTooth = scanner.nextLine();
+        try {
+            System.out.print("Enter item name: ");
+            String itemName = scanner.nextLine();
+            System.out.print("Enter item price: ");
+            double price = Double.parseDouble(scanner.nextLine());
+            System.out.print("Enter availability status (true/false): ");
+            boolean availabilityStatus = Boolean.parseBoolean(scanner.nextLine());
+            System.out.print("Enter food item type ID: ");
+            long foodItemTypeId = Long.parseLong(scanner.nextLine());
+            System.out.print("Select dietary preference (Vegetarian/Non Vegetarian/Eggetarian): ");
+            String dietaryPreference = scanner.nextLine();
+            System.out.print("Select spice level (High/Medium/Low): ");
+            String spiceLevel = scanner.nextLine();
+            System.out.print("Select cuisine preference (North Indian/South Indian/Other): ");
+            String cuisinePreference = scanner.nextLine();
+            System.out.print("Do you have a sweet tooth? (Yes/No): ");
+            String sweetTooth = scanner.nextLine();
 
-        sendRequest("ADMIN_ADD_MENU_ITEM#" + itemName + "#" + price + "#" + availabilityStatus + "#" + foodItemTypeId + "#" + dietaryPreference + "#" + spiceLevel + "#" + cuisinePreference + "#" + sweetTooth);
-        receiveAndPrintSingleResponse();
+            sendRequest("ADMIN_ADD_MENU_ITEM#" + itemName + "#" + price + "#" + availabilityStatus + "#" + foodItemTypeId + "#" + dietaryPreference + "#" + spiceLevel + "#" + cuisinePreference + "#" + sweetTooth);
+            receiveAndPrintSingleResponse();
+        } catch (NumberFormatException e) {
+            handleInvalidInput("Invalid input. Please enter the correct values.");
+        } catch (IOException e) {
+            handleServerCommunicationError(e);
+        }
     }
 
     private void updateMenuItems() {
-        System.out.print("Enter food item ID to update: ");
-        long foodItemId = scanner.nextLong();
-        scanner.nextLine();
-        System.out.print("Enter new item name: ");
-        String itemName = scanner.nextLine();
-        System.out.print("Enter new item price: ");
-        double price = scanner.nextDouble();
-        scanner.nextLine();
-        System.out.print("Enter new availability status (true/false): ");
-        boolean availabilityStatus = scanner.nextBoolean();
-        scanner.nextLine();
-        System.out.print("Enter new food item type ID: ");
-        long foodItemTypeId = scanner.nextLong();
-        scanner.nextLine();
-        System.out.print("Enter new dietary preference (Vegetarian/Non Vegetarian/Eggetarian): ");
-        String dietaryPreference = scanner.nextLine();
-        System.out.print("Enter new spice level (High/Medium/Low): ");
-        String spiceLevel = scanner.nextLine();
-        System.out.print("Enter new cuisine preference (North Indian/South Indian/Other): ");
-        String cuisinePreference = scanner.nextLine();
-        System.out.print("Do you have a sweet tooth? (Yes/No): ");
-        String sweetTooth = scanner.nextLine();
+        try {
+            System.out.print("Enter food item ID to update: ");
+            long foodItemId = Long.parseLong(scanner.nextLine());
+            System.out.print("Enter new item name: ");
+            String itemName = scanner.nextLine();
+            System.out.print("Enter new item price: ");
+            double price = Double.parseDouble(scanner.nextLine());
+            System.out.print("Enter new availability status (true/false): ");
+            boolean availabilityStatus = Boolean.parseBoolean(scanner.nextLine());
+            System.out.print("Enter new food item type ID: ");
+            long foodItemTypeId = Long.parseLong(scanner.nextLine());
+            System.out.print("Enter new dietary preference (Vegetarian/Non Vegetarian/Eggetarian): ");
+            String dietaryPreference = scanner.nextLine();
+            System.out.print("Enter new spice level (High/Medium/Low): ");
+            String spiceLevel = scanner.nextLine();
+            System.out.print("Enter new cuisine preference (North Indian/South Indian/Other): ");
+            String cuisinePreference = scanner.nextLine();
+            System.out.print("Do you have a sweet tooth? (Yes/No): ");
+            String sweetTooth = scanner.nextLine();
 
-        sendRequest("ADMIN_UPDATE_MENU_ITEM#" + foodItemId + "#" + itemName + "#" + price + "#" + availabilityStatus + "#" + foodItemTypeId + "#" + dietaryPreference + "#" + spiceLevel + "#" + cuisinePreference + "#" + sweetTooth);
-        receiveAndPrintSingleResponse();
+            sendRequest("ADMIN_UPDATE_MENU_ITEM#" + foodItemId + "#" + itemName + "#" + price + "#" + availabilityStatus + "#" + foodItemTypeId + "#" + dietaryPreference + "#" + spiceLevel + "#" + cuisinePreference + "#" + sweetTooth);
+            receiveAndPrintSingleResponse();
+        } catch (NumberFormatException e) {
+            handleInvalidInput("Invalid input. Please enter the correct values.");
+        } catch (IOException e) {
+            handleServerCommunicationError(e);
+        }
     }
 
     private void deleteMenuItems() {
-        System.out.print("Enter food item ID to delete: ");
-        long foodItemId = scanner.nextLong();
-        scanner.nextLine();
+        try {
+            System.out.print("Enter food item ID to delete: ");
+            long foodItemId = Long.parseLong(scanner.nextLine());
 
-        sendRequest("ADMIN_DELETE_MENU_ITEM#" + foodItemId);
-        receiveAndPrintSingleResponse();
+            sendRequest("ADMIN_DELETE_MENU_ITEM#" + foodItemId);
+            receiveAndPrintSingleResponse();
+        } catch (NumberFormatException e) {
+            handleInvalidInput("Invalid food item ID. Please enter a valid number.");
+        } catch (IOException e) {
+            handleServerCommunicationError(e);
+        }
     }
 
     private void viewMenu() {
-        sendRequest("COMMON_VIEW_MENU");
-        receiveAndPrintResponse("END_OF_MENU");
+        try {
+            sendRequest("COMMON_VIEW_MENU");
+            receiveAndPrintResponse("END_OF_MENU");
+        } catch (IOException e) {
+            handleServerCommunicationError(e);
+        }
     }
 
     private void logout() {
-        sendRequest("LOGOUT");
-        receiveAndPrintSingleResponse();
+        try {
+            sendRequest("LOGOUT");
+            receiveAndPrintSingleResponse();
+        } catch (IOException e) {
+            handleServerCommunicationError(e);
+        }
     }
 
     private void sendRequest(String request) {
         out.println(request);
     }
 
-    private void receiveAndPrintResponse(String endSignal) {
-        try {
-            String response;
-            while ((response = in.readLine()) != null) {
-                System.out.println(response);
-                if (response.equals(endSignal)) {
-                    break;
-                }
+    private void receiveAndPrintResponse(String endSignal) throws IOException {
+        String response;
+        while ((response = in.readLine()) != null) {
+            System.out.println(response);
+            if (response.equals(endSignal)) {
+                break;
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
-    private void receiveAndPrintSingleResponse() {
-        try {
-            String response = in.readLine();
-            System.out.println("Server reply: " + response);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    private void receiveAndPrintSingleResponse() throws IOException {
+        String response = in.readLine();
+        System.out.println("Server reply: " + response);
     }
 
+    private void handleInvalidInput(String message) {
+        System.out.println(message);
+    }
+
+    private void handleServerCommunicationError(IOException e) {
+        System.out.println("An error occurred while communicating with the server: " + e.getMessage());
+    }
 }

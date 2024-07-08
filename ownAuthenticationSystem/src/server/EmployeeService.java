@@ -212,9 +212,12 @@ public class EmployeeService {
                 String cuisinePreference = parts[5];
                 String sweetTooth = parts[6];
 
-                EmployeeProfile newProfile = new EmployeeProfile(userId, name, dietaryPreference, spiceLevel, cuisinePreference, sweetTooth);
                 EmployeeProfileDAO profileDAO = new EmployeeProfileDAO();
+                if (profileDAO.isEmployeeProfileExists(userId)) {
+                    return "Employee profile already exists.";
+                }
 
+                EmployeeProfile newProfile = new EmployeeProfile(userId, name, dietaryPreference, spiceLevel, cuisinePreference, sweetTooth);
                 boolean profileAdded = profileDAO.addEmployeeProfile(newProfile);
 
                 if (profileAdded) {

@@ -40,9 +40,13 @@ public class ChefHandler implements RoleHandler {
         int choice;
         do {
             printMenu();
-            choice = scanner.nextInt();
-            scanner.nextLine();
-            menuActions.getOrDefault(choice, this::invalidChoice).run();
+            try {
+                choice = Integer.parseInt(scanner.nextLine());
+                menuActions.getOrDefault(choice, this::invalidChoice).run();
+            } catch (NumberFormatException e) {
+                handleInvalidInput("Invalid input. Please enter a number.");
+                choice = -1;
+            }
         } while (choice != 0);
 
         System.out.println("Logging out...");
@@ -55,7 +59,7 @@ public class ChefHandler implements RoleHandler {
         System.out.println("2. Finalize Menu for Next Day");
         System.out.println("3. View Menu");
         System.out.println("4. View Discard Menu");
-        System.out.println("5. View Discard Menu Feedback");
+        System.out.println("5. View All Feedback by Food Name");
         System.out.println("0. Logout");
     }
 
@@ -64,16 +68,20 @@ public class ChefHandler implements RoleHandler {
     }
 
     private void rollOutMenuForNextDay() {
-        System.out.print("Enter the number of Items you want to view recommendation : ");
-        String numberOfItems = scanner.nextLine();
-        sendRequest("CHEF_ROLL_OUT_MENU"+"#"+ numberOfItems);
-        receiveAndPrintResponse("END_OF_MENU");
+        try {
+            System.out.print("Enter the number of items you want to view recommendations for: ");
+            String numberOfItems = scanner.nextLine();
+            sendRequest("CHEF_ROLL_OUT_MENU" + "#" + numberOfItems);
+            receiveAndPrintResponse("END_OF_MENU");
+        } catch (NumberFormatException e) {
+            handleInvalidInput("Invalid input. Please enter a valid number.");
+        }
     }
 
     private void finalizeMenuForNextDay() {
-        System.out.print("Enter the MenuId for the next day (comma separated Id): ");
+        System.out.print("Enter the MenuId for the next day (comma-separated IDs): ");
         String menuIds = scanner.nextLine();
-        sendRequest("CHEF_FINALIZE_MENU"+"#"+ menuIds);
+        sendRequest("CHEF_FINALIZE_MENU" + "#" + menuIds);
         receiveAndPrintSingleResponse();
     }
 
@@ -108,7 +116,7 @@ public class ChefHandler implements RoleHandler {
         sendRequest("REMOVE_FOOD_ITEM");
         System.out.print("Enter the name of the food item to be removed from the menu: ");
         String foodItemName = scanner.nextLine().trim();
-        sendRequest("foodName " +"#"+ foodItemName);
+        sendRequest("foodName" + "#" + foodItemName);
         receiveAndPrintResponse("End of Response");
     }
 
@@ -147,7 +155,7 @@ public class ChefHandler implements RoleHandler {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            handleServerCommunicationError(e);
         }
     }
 
@@ -156,7 +164,15 @@ public class ChefHandler implements RoleHandler {
             String response = userInput.readLine();
             System.out.println("Server reply: " + response);
         } catch (IOException e) {
-            e.printStackTrace();
+            handleServerCommunicationError(e);
         }
+    }
+
+    private void handleInvalidInput(String message) {
+        System.out.println(message);
+    }
+
+    private void handleServerCommunicationError(IOException e) {
+        System.out.println("An error occurred while communicating with the server: " + e.getMessage());
     }
 }
