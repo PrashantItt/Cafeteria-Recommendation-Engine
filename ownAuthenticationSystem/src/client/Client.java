@@ -22,22 +22,25 @@ public class Client {
             System.out.print("Enter password: ");
             String password = stdIn.readLine();
 
-            out.println("LOGIN " + username + " " + password);
+            out.println("LOGIN "+"#"+ username + "#" + password);
             String response = in.readLine();
             System.out.println("Server reply: " + response);
 
 
             if ("LOGIN SUCCESSFUL".equals(response)) {
                 String roleId = in.readLine();
-                System.out.println("Role ID: " + roleId);
+                //System.out.println("Role ID: " + roleId);
+                String userId = in.readLine();
+                System.out.println("User ID: " + userId);
                 System.out.println("Connected to the server. Type messages to send:");
                 RoleHandler roleHandler = RoleHandlerFactory.getHandler(Integer.valueOf(roleId), socket, out, in);
-                roleHandler.handle();
+                roleHandler.handle(userId);
 
 
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+            System.out.println("Server is not connected");
         }
     }
 }

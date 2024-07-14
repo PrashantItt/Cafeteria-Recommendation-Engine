@@ -1,78 +1,49 @@
 package server;
 
+import command.*;
+import service.CommonService;
+import service.EmployeeService;
+
 import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.Map;
 
 public class EmployeeController {
-
-    private EmployeeService employeeService;
+    private Map<String, Command> commandMap = new HashMap<>();
     private PrintWriter out;
 
     public EmployeeController(PrintWriter out) {
-        this.employeeService = new EmployeeService();
+        EmployeeService employeeService = new EmployeeService();
+        CommonService commonService = new CommonService();
         this.out = out;
+
+        commandMap.put("EMPLOYEE_SUBMIT_FEEDBACK", new SubmitFeedbackCommand(employeeService, out));
+        commandMap.put("EMPLOYEE_SUBMIT_DISCARD_FEEDBACK", new DiscardMenuFeedbackCommand(employeeService, out));
+        commandMap.put("EMPLOYEE_VIEW_TOMORROW_FOOD", new ViewRecommendedFoodCommand(employeeService, out));
+        commandMap.put("EMPLOYEE_VOTING_INPUT", new EmployeeVotingCommand(employeeService, out));
+        commandMap.put("EMPLOYEE_CREATE_PROFILE", new CreateEmployeeProfileCommand(employeeService, out));
+        commandMap.put("EMPLOYEE_UPDATE_PROFILE", new UpdateEmployeeProfileCommand(employeeService, out));
+        commandMap.put("EMPLOYEE_VIEW_NOTIFICATION", new ViewNotificationCommand(employeeService, out));
+        commandMap.put("EMPLOYEE_VIEW_MENU", new ViewMenuCommand(commonService, out));
+        commandMap.put("EMPLOYEE_DISCARD_MENU",new ViewDiscardMenuItems(employeeService, out));
     }
 
-    public void processCommand(String inputLine,long userId) {
+    public void processCommand(String inputLine) {
         String[] parts = inputLine.split("#");
         String command = parts[0];
+        System.out.println("command"+command);
         String arguments = inputLine.substring(command.length()).trim();
-        System.out.println("arguments" +arguments);
-        switch (command) {
-            case "EMPLOYEE_SUBMIT_FEEDBACK":
-                handleSubmitFeedback(inputLine);
-                break;
-            case "EMPLOYEE_SUBMIT_DISCARD_FEEDBACK" :
-                handleDiscardMenuFeedback(inputLine);
-                break;
-            case "EMPLOYEE_VIEW_TOMORROW_FOOD":
-                handleViewRecommendedFood(inputLine,userId);
-                break;
-            case "EMPLOYEE_VOTING_INPUT":
-                handleEmployeeVoting(inputLine,out);
-                break;
-            case "EMPLOYEE_CREATE_PROFILE":
-                handleCreateEmployeeProfile(inputLine);
-                break;
-            case "EMPLOYEE_UPDATE_PROFILE":
-                handleUpdateEmployeeProfile(inputLine);
-                break;
-            case "EMPLOYEE_VIEW_NOTIFICATION":
-                handleViewNotification(inputLine);
-                break;
-            default:
-                out.println("Invalid EMPLOYEE command");
+        System.out.println("arguments"+arguments);
+        Command commandObj = commandMap.get(command);
+
+        if (commandObj != null) {
+            try {
+                commandObj.execute(arguments);
+            } catch (Exception e) {
+                out.println("Error processing command: " + e.getMessage());
+            }
+        } else {
+            out.println("Invalid EMPLOYEE command");
         }
-    }
-
-    private void handleSubmitFeedback(String arguments) {
-        String response = employeeService.handleSubmitFeedback(arguments);
-        out.println(response);
-    }
-    private void handleDiscardMenuFeedback(String request) {
-        System.out.println("Employee Discard item");
-        String response = employeeService.handleDiscardMenuFeedback(request);
-        out.println(response);
-    }
-    private void handleViewRecommendedFood(String request,Long userId) {
-        String response = employeeService.handleViewRecommendedFood(request,userId);
-        System.out.println("response"+response);
-        out.println(response);
-        out.println("END_OF_MENU");
-    }
-    private void handleEmployeeVoting(String request,PrintWriter out) {
-        employeeService.handleEmployeeVoting(request,out);
-    }
-    private void handleCreateEmployeeProfile(String request) {
-        String response = employeeService.handleCreateEmployeeProfile(request);
-        out.println(response);
-    }
-
-    private void handleUpdateEmployeeProfile(String request) {
-        String response = employeeService.handleUpdateEmployeeProfile(request);
-        out.println(response);
-    }
-    private void handleViewNotification(String request) {
-        String response =employeeService.handleViewNotification(request);
-        out.println(response);
     }
 }

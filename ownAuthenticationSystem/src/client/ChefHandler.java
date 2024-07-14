@@ -24,7 +24,7 @@ public class ChefHandler implements RoleHandler {
     }
 
     @Override
-    public void handle() throws IOException {
+    public void handle(String userId) throws IOException {
         showMenu();
     }
 
@@ -33,7 +33,7 @@ public class ChefHandler implements RoleHandler {
         menuActions.put(2, this::finalizeMenuForNextDay);
         menuActions.put(3, this::viewMenu);
         menuActions.put(4, this::viewDiscardMenu);
-        menuActions.put(5, this::getAllFeedbackByFoodName);
+        menuActions.put(5, this::getAllFeedbackOfDiscardedFoodName);
     }
 
     private void showMenu() {
@@ -59,7 +59,7 @@ public class ChefHandler implements RoleHandler {
         System.out.println("2. Finalize Menu for Next Day");
         System.out.println("3. View Menu");
         System.out.println("4. View Discard Menu");
-        System.out.println("5. View All Feedback by Food Name");
+        System.out.println("5. View Discarded Feedback by Food Name");
         System.out.println("0. Logout");
     }
 
@@ -86,7 +86,7 @@ public class ChefHandler implements RoleHandler {
     }
 
     private void viewMenu() {
-        sendRequest("COMMON_VIEW_MENU");
+        sendRequest("CHEF_VIEW_MENU");
         receiveAndPrintResponse("END_OF_MENU");
     }
 
@@ -128,7 +128,7 @@ public class ChefHandler implements RoleHandler {
         receiveAndPrintResponse("End of Response");
     }
 
-    private void getAllFeedbackByFoodName() {
+    private void getAllFeedbackOfDiscardedFoodName() {
         System.out.print("Enter the name of the food item to view all feedback: ");
         String foodItemName = scanner.nextLine().trim();
         sendRequest("CHEF_GET_ALL_FEEDBACK_BY_FOOD_NAME" + "#" + foodItemName);

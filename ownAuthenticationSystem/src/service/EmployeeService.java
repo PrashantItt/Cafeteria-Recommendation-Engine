@@ -1,7 +1,8 @@
-package server;
+package service;
 
 import db.*;
 import model.*;
+import recomendationEngine.RecommendationSystem;
 
 import java.io.PrintWriter;
 import java.util.*;
@@ -72,7 +73,10 @@ public class EmployeeService {
 
     }
 
-    public String handleViewRecommendedFood(String request, Long userId) {
+    public String handleViewRecommendedFood(String request) {
+        String[] parts = request.split("#");
+        System.out.println("request"+parts[1]);
+        Long userId = Long.valueOf(parts[1]);
         ChefRecomendationFoodDAO chefRecomendationFoodDAO = new ChefRecomendationFoodDAO();
         FoodItemTypeDAO foodItemTypeDAO = new FoodItemTypeDAO();
         FoodItemDAO foodItemDAO = new FoodItemDAO();
@@ -142,8 +146,10 @@ public class EmployeeService {
 
     public void handleEmployeeVoting(String response, PrintWriter out) {
         String[] parts = response.split("#", 2);
-        if (parts.length == 2 && parts[0].equals("EMPLOYEE_VOTING_INPUT")) {
+        System.out.println("parts"+parts[1]);
+        if (parts.length == 2 && parts[0].equals("")) {
             String votingData = parts[1];
+            System.out.println("parts1"+parts[1]);
             Map<String, Long> votingMap = parseVotingData(votingData);
 
             processVotes(votingMap,out);
@@ -195,7 +201,6 @@ public class EmployeeService {
                 }
             } catch (Exception e) {
                 out.println("ERROR: An error occurred while processing vote for Meal: " + entry.getKey() + ", Item ID: " + entry.getValue());
-                e.printStackTrace(out);
             }
         }
         out.println("END_OF_VOTING_PROCESS");
@@ -203,6 +208,7 @@ public class EmployeeService {
 
     public String handleCreateEmployeeProfile(String request) {
         String[] parts = request.split("#");
+        System.out.println("request :"+request);
         if (parts.length == 7) {
             try {
                 long userId = Long.parseLong(parts[1]);
@@ -235,6 +241,7 @@ public class EmployeeService {
 
     public String handleUpdateEmployeeProfile(String request) {
         String[] parts = request.split("#");
+        System.out.println();
         if (parts.length == 7) {
             try {
                 long userId = Long.parseLong(parts[1]);
@@ -283,6 +290,29 @@ public class EmployeeService {
             return "Invalid View Notification request format.";
         }
     }
+    public String ViewDiscardMenuItems() {
+        RecommendationSystem recommendationSystem = new RecommendationSystem();
+        List<Map<String, Object>> lowRatedFoodItems = recommendationSystem.getLowRatedFoodItems();
 
+        StringBuilder output = new StringBuilder();
+
+        output.append("Low Rated Food Items:\n");
+        output.append(String.format("%-15s %-30s %-20s %-10s %-50s\n", "MenuItemId", "MenuItemName", "Average Rating", "Price", "Sentiment Comment"));
+        output.append("----------------------------------------------------------------------------------------------------------------------------\n");
+
+        for (Map<String, Object> item : lowRatedFoodItems) {
+            output.append(String.format("%-15d %-30s %-20.2f %-10.2f %-50s\n",
+                    (Long) item.get("Id"),
+                    (String) item.get("Name"),
+                    (Double) item.get("AverageRating"),
+                    (Double) item.get("Price"),
+                    (String) item.get("SentimentComment")));
+        }
+
+        output.append("\n");
+        output.append("END_OF_MENU");
+
+        return output.toString();
+    }
 
 }

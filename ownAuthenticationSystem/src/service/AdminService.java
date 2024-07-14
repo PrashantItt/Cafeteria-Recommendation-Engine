@@ -1,4 +1,4 @@
-package server;
+package service;
 
 import db.FoodItemDAO;
 import db.FoodItemTypeDAO;
@@ -44,8 +44,14 @@ public class AdminService {
                 Long newRoleId = Long.valueOf(parts[3]);
                 User user = new User(username, newPassword, newRoleId);
                 UserDAO userDAO = new UserDAO();
-                userDAO.updateUser(user);
-                return "User updated successfully";
+                boolean response = userDAO.updateUser(user);
+                if(response) {
+                    return "User updated successfully";
+                }
+                else {
+                    return "User update successfully";
+                }
+
             } catch (NumberFormatException e) {
                 return "Invalid role ID format";
             }

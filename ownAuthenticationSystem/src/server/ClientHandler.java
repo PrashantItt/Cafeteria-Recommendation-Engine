@@ -20,6 +20,7 @@ public class ClientHandler implements Runnable {
     private CommonController commonController;
     private final UserService userService;
     private Long userId;
+    private Long roleId;
     private UserActivityDAO userActivityDAO;
     private UserActivity currentUserActivity;
 
@@ -36,6 +37,7 @@ public class ClientHandler implements Runnable {
 
             String inputLine;
             while ((inputLine = in.readLine()) != null) {
+                System.out.println(inputLine);
                 if (inputLine.startsWith("LOGIN ")) {
                    handleLogin(inputLine, out);
                 } else if (inputLine.startsWith("LOGOUT")) {
@@ -54,13 +56,8 @@ public class ClientHandler implements Runnable {
                     if (employeeController == null) {
                         employeeController = new EmployeeController(out);
                     }
-                    employeeController.processCommand(inputLine,userId);
-                } else if (inputLine.startsWith("COMMON_")) {
-                    if (commonController == null) {
-                        commonController = new CommonController(out,in);
-                    }
-                    commonController.processCommand(inputLine);
-                } else {
+                    employeeController.processCommand(inputLine);
+                }else {
                     out.println("Unknown command");
                 }
             }
@@ -77,16 +74,18 @@ public class ClientHandler implements Runnable {
     }
 
     private void handleLogin(String inputLine, PrintWriter out) throws SQLException {
-        String[] parts = inputLine.split(" ");
+        String[] parts = inputLine.split("#");
         if (parts.length == 3) {
             String username = parts[1];
             String password = parts[2];
             if (userService.validateLogin(username, password)) {
                 out.println("LOGIN SUCCESSFUL");
+                roleId = userService.getRoleId(username,password);
                 userId= userService.getUserId(username, password);
                 UserActivity userActivity = new UserActivity(userId);
                 UserActivityDAO userActivityDAO = new UserActivityDAO();
                 boolean response = userActivityDAO.addUserActivity(userActivity);
+                out.println(roleId);
                 out.println(userId);
             } else {
                 out.println("LOGIN FAILED");

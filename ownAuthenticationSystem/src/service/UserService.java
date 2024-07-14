@@ -13,4 +13,7 @@ public class UserService {
         return userDAO.getUserIdByUsernameAndPassword(username,password);
     }
 
+    public Long getRoleId(String username, String password) {
+        return userDAO.getRoleIdByUsernameAndPassword(username,password);
+    }
 }

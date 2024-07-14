@@ -65,7 +65,7 @@ public class UserDAO {
         return false;
     }
 
-    public Long getUserIdByUsernameAndPassword(String username, String password) {
+    public Long getRoleIdByUsernameAndPassword(String username, String password) {
         Long roleId = null;
         try (Connection connection = Database.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement("SELECT roleId FROM User WHERE name = ? AND password = ?")) {
 
@@ -81,6 +81,24 @@ public class UserDAO {
             e.printStackTrace();
         }
         return roleId;
+    }
+
+    public Long getUserIdByUsernameAndPassword(String username, String password) {
+        Long userId = null;
+        try (Connection connection = Database.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement("SELECT userId FROM User WHERE name = ? AND password = ?")) {
+
+            preparedStatement.setString(1, username);
+            preparedStatement.setString(2, password);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    userId = resultSet.getLong("userId");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return userId;
     }
 
     public boolean validateUser(String username, String password) {

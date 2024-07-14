@@ -15,6 +15,7 @@ public class EmployeeHandler implements RoleHandler {
     private final BufferedReader in;
     private final Map<Integer, Runnable> menuActions = new HashMap<>();
     private final Scanner scanner;
+    private long userId;
 
     public EmployeeHandler(Socket socket, PrintWriter out, BufferedReader in) {
         this.socket = socket;
@@ -25,7 +26,8 @@ public class EmployeeHandler implements RoleHandler {
     }
 
     @Override
-    public void handle() {
+    public void handle(String userId) {
+        this.userId = Long.parseLong(userId);
         showMenu();
     }
 
@@ -37,6 +39,7 @@ public class EmployeeHandler implements RoleHandler {
         menuActions.put(5, this::discardMenuFeedback);
         menuActions.put(6, this::createProfile);
         menuActions.put(7, this::updateProfile);
+        menuActions.put(8, this::viewDiscardedMenu);
     }
 
     private void showMenu() {
@@ -61,6 +64,7 @@ public class EmployeeHandler implements RoleHandler {
         System.out.println("5. Submit Feedback For Discard Menu");
         System.out.println("6. Create Profile");
         System.out.println("7. Update Profile");
+        System.out.println("8. View Discarded Menu");
         System.out.println("0. Logout");
     }
 
@@ -69,7 +73,7 @@ public class EmployeeHandler implements RoleHandler {
     }
 
     private void viewMenu() {
-        sendRequest("COMMON_VIEW_MENU");
+        sendRequest("EMPLOYEE_VIEW_MENU");
         receiveAndPrintResponse("END_OF_MENU");
     }
 
@@ -79,11 +83,11 @@ public class EmployeeHandler implements RoleHandler {
     }
 
     private void selectFoodItemsForTomorrow() {
-        sendRequest("EMPLOYEE_VIEW_TOMORROW_FOOD");
+        sendRequest("EMPLOYEE_VIEW_TOMORROW_FOOD"+ "#" +userId);
         receiveAndPrintResponse("END_OF_MENU");
 
         Map<String, Long> votingInput = votingForMenu();
-        out.println("EMPLOYEE_VOTING_INPUT#" + votingInput);
+        out.println("EMPLOYEE_VOTING_INPUT" +"#"+ votingInput);
 
         receiveAndPrintResponse("END_OF_VOTING_PROCESS");
     }
@@ -112,9 +116,9 @@ public class EmployeeHandler implements RoleHandler {
 
     private void submitFeedback() {
         try {
-            System.out.print("Enter your user ID: ");
+            /*System.out.print("Enter your user ID: ");
             long userId = scanner.nextLong();
-            scanner.nextLine();
+            scanner.nextLine();*/
 
             System.out.print("Enter the food item ID: ");
             long foodItemId = scanner.nextLong();
@@ -152,10 +156,6 @@ public class EmployeeHandler implements RoleHandler {
             System.out.print("Q3. Share your mom’s recipe: ");
             String momRecipe = scanner.nextLine().trim();
 
-            System.out.print("Enter your user ID: ");
-            long userId = scanner.nextLong();
-            scanner.nextLine();
-
             sendRequest("EMPLOYEE_SUBMIT_DISCARD_FEEDBACK#" + userId + "#" + foodName + "#" + dislikeAboutFood + "#" + likeAboutFood + "#" + momRecipe);
             receiveAndPrintSingleResponse();
         } catch (NumberFormatException e) {
@@ -165,9 +165,6 @@ public class EmployeeHandler implements RoleHandler {
 
     private void createProfile() {
         try {
-            System.out.print("Enter your user ID: ");
-            long userId = scanner.nextLong();
-            scanner.nextLine();
 
             System.out.print("Enter your name: ");
             String name = scanner.nextLine().trim();
@@ -193,20 +190,17 @@ public class EmployeeHandler implements RoleHandler {
 
     private void updateProfile() {
         try {
-            System.out.print("Enter your user ID: ");
-            long userId = scanner.nextLong();
-            scanner.nextLine();
 
-            System.out.print("Enter your updated name (press Enter to skip): ");
+            System.out.print("Enter your updated name : ");
             String name = scanner.nextLine().trim();
 
-            System.out.print("Enter your updated dietary preference (press Enter to skip): ");
+            System.out.print("Enter your Updated dietary preference (Vegetarian/Non Vegetarian/Eggetarian): ");
             String dietaryPreference = scanner.nextLine().trim();
 
-            System.out.print("Enter your updated spice level preference (press Enter to skip): ");
+            System.out.print("Enter your updated spice level preference (High/Medium/Low): ");
             String spiceLevel = scanner.nextLine().trim();
 
-            System.out.print("Enter your updated cuisine preference (press Enter to skip): ");
+            System.out.print("Enter your updated cuisine preference (North Indian/South Indian/Other): ");
             String cuisinePreference = scanner.nextLine().trim();
 
             System.out.print("Update your sweet tooth preference? (Yes/No, press Enter to skip): ");
@@ -218,6 +212,11 @@ public class EmployeeHandler implements RoleHandler {
             handleInvalidInput("Invalid input. Please enter the correct values.");
         }
 
+    }
+
+    private void viewDiscardedMenu() {
+        sendRequest("EMPLOYEE_DISCARD_MENU");
+        receiveAndPrintResponse("END_OF_MENU");
     }
 
     private void logout() {

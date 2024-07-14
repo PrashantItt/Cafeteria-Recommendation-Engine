@@ -24,7 +24,7 @@ public class AdminHandler implements RoleHandler {
     }
 
     @Override
-    public void handle() {
+    public void handle(String userId) {
         showMenu();
     }
 
@@ -193,7 +193,7 @@ public class AdminHandler implements RoleHandler {
 
     private void viewMenu() {
         try {
-            sendRequest("COMMON_VIEW_MENU");
+            sendRequest("ADMIN_VIEW_MENU");
             receiveAndPrintResponse("END_OF_MENU");
         } catch (IOException e) {
             handleServerCommunicationError(e);
@@ -235,4 +235,5 @@ public class AdminHandler implements RoleHandler {
     private void handleServerCommunicationError(IOException e) {
         System.out.println("An error occurred while communicating with the server: " + e.getMessage());
     }
+
 }
