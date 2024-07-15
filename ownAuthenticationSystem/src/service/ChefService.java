@@ -63,7 +63,7 @@ public class ChefService {
 
 
 
-    public void handleRoleItemMenu(String arguments, PrintWriter out) throws SQLException {
+    public void handleRoleItemMenu(String arguments, PrintWriter out) {
         String[] splitString = arguments.split("#");
         RecommendationSystem recommendationSystem = new RecommendationSystem();
         Map<String, List<Map<String, Object>>> top3FoodItemsByCategory = recommendationSystem.getTopFoodItemsByCategory(splitString[1]);
@@ -90,7 +90,7 @@ public class ChefService {
         out.println("END_OF_MENU");
     }
 
-    public void discardItemList(PrintWriter out, BufferedReader in) throws SQLException, IOException {
+    public void discardItemList(PrintWriter out, BufferedReader in) throws IOException {
         RecommendationSystem recommendationSystem = new RecommendationSystem();
         List<Map<String, Object>> lowRatedFoodItems = recommendationSystem.getLowRatedFoodItems();
 

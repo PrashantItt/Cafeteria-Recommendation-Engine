@@ -25,54 +25,5 @@ public class DiscardFoodItemDAO {
         }
         return false;
     }
-
-    public List<DiscardFoodItem> getAllDiscardFoodItems() {
-        List<DiscardFoodItem> discardFoodItems = new ArrayList<>();
-        String sql = "SELECT * FROM discardedfoods";
-        try (Connection connection = Database.getConnection(); Statement statement = connection.createStatement(); ResultSet resultSet = statement.executeQuery(sql)) {
-
-            while (resultSet.next()) {
-                long id = resultSet.getLong("Id");
-                String foodName = resultSet.getString("foodName");
-                String likeAboutFood = resultSet.getString("likeAboutFood");
-                String dislikeAboutFood = resultSet.getString("dislikeAboutFood");
-                String momRecipe = resultSet.getString("momRecipe");
-                long userId = resultSet.getLong("userId");
-                Date date = resultSet.getDate("discardDate");
-
-                discardFoodItems.add(new DiscardFoodItem(id, foodName, likeAboutFood, dislikeAboutFood, momRecipe, userId, date));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return discardFoodItems;
-    }
-
-
-    public List<DiscardFoodItem> getDiscardFoodItemsByName(String foodName) {
-        List<DiscardFoodItem> discardFoodItems = new ArrayList<>();
-        String sql = "SELECT * FROM discardedfoods WHERE foodName = ?";
-        try (Connection connection = Database.getConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
-
-            statement.setString(1, foodName);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    long id = resultSet.getLong("Id");
-                    String likeAboutFood = resultSet.getString("likeAboutFood");
-                    String dislikeAboutFood = resultSet.getString("dislikeAboutFood");
-                    String momRecipe = resultSet.getString("momRecipe");
-                    long userId = resultSet.getLong("userId");
-                    Date discardDate = resultSet.getDate("discardDate");
-
-                    discardFoodItems.add(new DiscardFoodItem(id, foodName, likeAboutFood, dislikeAboutFood, momRecipe, userId, discardDate));
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return discardFoodItems;
-    }
-
-
 }
 

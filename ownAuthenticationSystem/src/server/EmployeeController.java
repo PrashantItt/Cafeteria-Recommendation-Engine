@@ -31,9 +31,7 @@ public class EmployeeController {
     public void processCommand(String inputLine) {
         String[] parts = inputLine.split("#");
         String command = parts[0];
-        System.out.println("command"+command);
         String arguments = inputLine.substring(command.length()).trim();
-        System.out.println("arguments"+arguments);
         Command commandObj = commandMap.get(command);
 
         if (commandObj != null) {

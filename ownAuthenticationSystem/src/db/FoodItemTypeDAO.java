@@ -8,20 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FoodItemTypeDAO {
-
-    public boolean addFoodItemType(String foodItemType) {
-        String query = "INSERT INTO foodItemType (foodItemType) VALUES (?)";
-        try (Connection connection = Database.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-
-            preparedStatement.setString(1, foodItemType);
-            return preparedStatement.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-
     public FoodItemType getFoodItemTypeById(long foodItemTypeId) {
         String query = "SELECT * FROM foodItemType WHERE foodItemTypeId = ?";
         try (Connection connection = Database.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(query)) {

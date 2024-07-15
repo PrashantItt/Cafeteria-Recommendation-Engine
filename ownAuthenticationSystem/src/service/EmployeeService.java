@@ -19,7 +19,6 @@ public class EmployeeService {
                 long menuItemId = Long.parseLong(parts[2]);
                 int rating = Integer.parseInt(parts[3]);
                 String comment = parts[4];
-                System.out.println("comment" +comment);
                 String date = parts[5];
 
                 FeedbackDAO feedbackDAO = new FeedbackDAO();
@@ -75,7 +74,6 @@ public class EmployeeService {
 
     public String handleViewRecommendedFood(String request) {
         String[] parts = request.split("#");
-        System.out.println("request"+parts[1]);
         Long userId = Long.valueOf(parts[1]);
         ChefRecomendationFoodDAO chefRecomendationFoodDAO = new ChefRecomendationFoodDAO();
         FoodItemTypeDAO foodItemTypeDAO = new FoodItemTypeDAO();
@@ -146,12 +144,10 @@ public class EmployeeService {
 
     public void handleEmployeeVoting(String response, PrintWriter out) {
         String[] parts = response.split("#", 2);
-        System.out.println("parts"+parts[1]);
         if (parts.length == 2 && parts[0].equals("")) {
             String votingData = parts[1];
             System.out.println("parts1"+parts[1]);
             Map<String, Long> votingMap = parseVotingData(votingData);
-
             processVotes(votingMap,out);
         } else {
             System.out.println("Invalid input or no voting data received.");
@@ -178,7 +174,6 @@ public class EmployeeService {
     private void processVotes(Map<String, Long> votingMap,PrintWriter out) {
         System.out.println("Processing Votes:");
         for (Map.Entry<String, Long> entry : votingMap.entrySet()) {
-            System.out.println("Meal: " + entry.getKey() + ", Item ID: " + entry.getValue());
 
             try {
                 FoodItemTypeDAO foodItemTypeDAO = new FoodItemTypeDAO();
@@ -208,7 +203,6 @@ public class EmployeeService {
 
     public String handleCreateEmployeeProfile(String request) {
         String[] parts = request.split("#");
-        System.out.println("request :"+request);
         if (parts.length == 7) {
             try {
                 long userId = Long.parseLong(parts[1]);
@@ -241,7 +235,6 @@ public class EmployeeService {
 
     public String handleUpdateEmployeeProfile(String request) {
         String[] parts = request.split("#");
-        System.out.println();
         if (parts.length == 7) {
             try {
                 long userId = Long.parseLong(parts[1]);

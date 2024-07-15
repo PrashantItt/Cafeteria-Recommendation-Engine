@@ -17,7 +17,6 @@ public class ClientHandler implements Runnable {
     private AdminController adminController;
     private ChefController chefController;
     private EmployeeController employeeController;
-    private CommonController commonController;
     private final UserService userService;
     private Long userId;
     private Long roleId;
@@ -72,7 +71,6 @@ public class ClientHandler implements Runnable {
             System.out.println("Client disconnected");
         }
     }
-
     private void handleLogin(String inputLine, PrintWriter out) throws SQLException {
         String[] parts = inputLine.split("#");
         if (parts.length == 3) {
@@ -94,7 +92,6 @@ public class ClientHandler implements Runnable {
             out.println("Invalid LOGIN command");
         }
     }
-
     private void handleLogout(PrintWriter out) throws SQLException {
         if (userId != null) {
             UserActivity userActivity = new UserActivity(userId);

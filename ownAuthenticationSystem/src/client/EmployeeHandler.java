@@ -116,9 +116,6 @@ public class EmployeeHandler implements RoleHandler {
 
     private void submitFeedback() {
         try {
-            /*System.out.print("Enter your user ID: ");
-            long userId = scanner.nextLong();
-            scanner.nextLine();*/
 
             System.out.print("Enter the food item ID: ");
             long foodItemId = scanner.nextLong();

@@ -29,7 +29,6 @@ public class Client {
 
             if ("LOGIN SUCCESSFUL".equals(response)) {
                 String roleId = in.readLine();
-                //System.out.println("Role ID: " + roleId);
                 String userId = in.readLine();
                 System.out.println("User ID: " + userId);
                 System.out.println("Connected to the server. Type messages to send:");
