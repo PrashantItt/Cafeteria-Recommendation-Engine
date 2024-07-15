@@ -15,6 +15,7 @@ public class FinalizeMenuCommand implements Command {
 
     @Override
     public void execute(String arguments) {
-        chefService.handleFinalizeMenu(out);
+        String response = chefService.handleFinalizeMenu();
+        out.println(response);
     }
 }

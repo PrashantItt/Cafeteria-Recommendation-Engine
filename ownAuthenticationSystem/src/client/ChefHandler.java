@@ -24,7 +24,7 @@ public class ChefHandler implements RoleHandler {
     }
 
     @Override
-    public void handle(String userId) throws IOException {
+    public void handle(String userId) {
         showMenu();
     }
 
@@ -34,6 +34,7 @@ public class ChefHandler implements RoleHandler {
         menuActions.put(3, this::viewMenu);
         menuActions.put(4, this::viewDiscardMenu);
         menuActions.put(5, this::getAllFeedbackOfDiscardedFoodName);
+        menuActions.put(6, this::maxVoteForTommorowMenu);
     }
 
     private void showMenu() {
@@ -60,6 +61,7 @@ public class ChefHandler implements RoleHandler {
         System.out.println("3. View Menu");
         System.out.println("4. View Discard Menu");
         System.out.println("5. View Discarded Feedback by Food Name");
+        System.out.println("6. View Maximum voted Items For Tommorow");
         System.out.println("0. Logout");
     }
 
@@ -133,6 +135,12 @@ public class ChefHandler implements RoleHandler {
         String foodItemName = scanner.nextLine().trim();
         sendRequest("CHEF_GET_ALL_FEEDBACK_BY_FOOD_NAME" + "#" + foodItemName);
         receiveAndPrintResponse("END_OF_FEEDBACK");
+    }
+
+    private void maxVoteForTommorowMenu() {
+        System.out.println("Maximum votes for Tommorow Menu :");
+        sendRequest("CHEF_FINAL_ITEM");
+        receiveAndPrintResponse("END_OF_MENU");
     }
 
     private void logout() {

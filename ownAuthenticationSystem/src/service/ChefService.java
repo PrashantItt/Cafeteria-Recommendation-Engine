@@ -3,12 +3,13 @@ package service;
 import db.*;
 import model.ChefRecomendationFood;
 import model.DiscardFoodFeedback;
+import model.FoodItem;
+import model.FoodItemType;
 import recomendationEngine.RecommendationSystem;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -169,16 +170,30 @@ public class ChefService {
         out.println("End of Response");
         out.flush();
     }
+    public String handleFinalizeMenu() {
+        List<ChefRecomendationFood> chefRecomendationFoodList = chefRecomendationFoodDAO.getTopFoodItemsForToday();
+        FoodItemTypeDAO foodItemTypeDAO = new FoodItemTypeDAO();
+        FoodItemDAO foodItemDAO = new FoodItemDAO();
 
-    public void handleFinalizeMenu(PrintWriter out) {
-        List<ChefRecomendationFood> chefRecomendationFoodList = chefRecomendationFoodDAO.getTop3FoodItemsForToday();
+        StringBuilder menuString = new StringBuilder();
+        menuString.append(String.format("%-30s %-20s\n", "Food Item Name", "Food Type Name"));
 
         for (ChefRecomendationFood foodItem : chefRecomendationFoodList) {
-            out.println("Food Item ID: " + foodItem.getFoodItemId());
+            FoodItemType foodItemType = foodItemTypeDAO.getFoodItemTypeById(foodItem.getFoodtypeId());
+            String foodTypeName = (foodItemType != null) ? foodItemType.getFoodItemType() : "Unknown";
+            FoodItem food = foodItemDAO.getFoodItemById(foodItem.getFoodItemId());
+            String foodName = (food != null) ? food.getItemName() : "Unknown";
+
+            menuString.append(String.format("%-30s %-20s\n", foodName, foodTypeName));
         }
 
-        out.println("END_OF_MENU");
+        menuString.append("END_OF_MENU");
+        return menuString.toString();
     }
+
+
+
+
 
     public void handleDisplayDiscardMenuList(String inputLine, PrintWriter out) {
         String[] parts = inputLine.split("#");

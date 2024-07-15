@@ -7,12 +7,14 @@ public class ChefRecomendationFood {
     private long foodItemId;
     private long foodtypeId;
     private Date date;
+    private long vote;
 
 
 
-    public ChefRecomendationFood(long foodItemId, long foodtypeId) {
+    public ChefRecomendationFood(long foodItemId, long foodtypeId, long vote) {
         this.foodItemId = foodItemId;
         this.foodtypeId = foodtypeId;
+        this.vote = vote;
     }
     public ChefRecomendationFood(long foodItemId) {
         this.foodItemId = foodItemId;
@@ -50,6 +52,8 @@ public class ChefRecomendationFood {
     public void setDate(Date date) {
         this.date = date;
     }
+    public long getVote() {return vote;}
+    public void setVote(long vote) {this.vote = vote; }
 
     @Override
     public String toString() {

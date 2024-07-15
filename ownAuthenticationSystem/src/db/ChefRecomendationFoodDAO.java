@@ -7,7 +7,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import model.ChefRecomendationFood;
 import model.FoodItem;
@@ -64,9 +66,17 @@ public class ChefRecomendationFoodDAO {
         }
     }
 
-    public List<ChefRecomendationFood> getTop3FoodItemsForToday() {
+    public List<ChefRecomendationFood> getTopFoodItemsForToday() {
         List<ChefRecomendationFood> topFoodItems = new ArrayList<>();
-        String sql = "SELECT crf.foodItemId, crf.foodtypeId, MAX(crf.vote) AS max_votes " + "FROM chefRecomendationFood crf " + "WHERE crf.Date = ? " + "GROUP BY crf.foodItemId, crf.foodtypeId " + "ORDER BY max_votes DESC " + "LIMIT 3";
+        String sql = "SELECT crf.foodItemId, crf.foodtypeId, crf.vote " +
+                "FROM chefRecomendationFood crf " +
+                "WHERE crf.Date = ? " +
+                "AND crf.vote = ( " +
+                "    SELECT MAX(inner_crf.vote) " +
+                "    FROM chefRecomendationFood inner_crf " +
+                "    WHERE inner_crf.foodtypeId = crf.foodtypeId " +
+                "    AND inner_crf.Date = crf.Date " +
+                ")";
 
         try (Connection connection = Database.getConnection(); PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setDate(1, Date.valueOf(LocalDate.now()));
@@ -75,8 +85,9 @@ public class ChefRecomendationFoodDAO {
                 while (rs.next()) {
                     long foodItemId = rs.getLong("foodItemId");
                     long foodtypeId = rs.getLong("foodtypeId");
+                    int vote = rs.getInt("vote");
 
-                    ChefRecomendationFood foodItem = new ChefRecomendationFood(foodItemId, foodtypeId);
+                    ChefRecomendationFood foodItem = new ChefRecomendationFood(foodItemId, foodtypeId, vote);
                     topFoodItems.add(foodItem);
                 }
             }
@@ -85,6 +96,7 @@ public class ChefRecomendationFoodDAO {
         }
         return topFoodItems;
     }
+
     public boolean entryExistsForToday() {
         String query = "SELECT COUNT(*) FROM chefRecomendationFood WHERE `Date` = CURDATE()";
         try (Connection connection = Database.getConnection(); PreparedStatement stmt = connection.prepareStatement(query)) {
