@@ -26,8 +26,8 @@ public class ClientTest {
                 String loginRequest = in.readLine();
                 if ("LOGIN #testuser#password".equals(loginRequest)) {
                     out.println("LOGIN SUCCESSFUL");
-                    out.println("1"); // Role ID
-                    out.println("1001"); // User ID
+                    out.println("1"); 
+                    out.println("1001");
                 } else {
                     out.println("LOGIN FAILED");
                 }
