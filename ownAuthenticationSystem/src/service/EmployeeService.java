@@ -75,53 +75,71 @@ public class EmployeeService {
     public String handleViewRecommendedFood(String request) {
         String[] parts = request.split("#");
         Long userId = Long.valueOf(parts[1]);
-        ChefRecomendationFoodDAO chefRecomendationFoodDAO = new ChefRecomendationFoodDAO();
-        FoodItemTypeDAO foodItemTypeDAO = new FoodItemTypeDAO();
-        FoodItemDAO foodItemDAO = new FoodItemDAO();
-        EmployeeProfileDAO employeeProfileDAO = new EmployeeProfileDAO();
 
-        List<FoodItem> foodItems = new ArrayList<>();
+        List<FoodItem> recommendedFoodItems = getRecommendedFoodItems();
+        Map<Long, FoodItemType> foodItemTypeMap = getFoodItemTypeMap();
+        EmployeeProfile employeeProfile = getEmployeeProfile(userId);
+
+        List<FoodItem> sortedFoodItems = sortFoodItemsByPreferences(recommendedFoodItems, foodItemTypeMap, employeeProfile);
+        return generateMenuString(sortedFoodItems, foodItemTypeMap);
+    }
+
+    private List<FoodItem> getRecommendedFoodItems() {
+        ChefRecomendationFoodDAO chefRecomendationFoodDAO = new ChefRecomendationFoodDAO();
         List<FoodItem> recommendedFoodItems = chefRecomendationFoodDAO.getTommorowMenu();
 
+        FoodItemDAO foodItemDAO = new FoodItemDAO();
+        List<FoodItem> foodItems = new ArrayList<>();
         for (FoodItem foodItem : recommendedFoodItems) {
             FoodItem detailedFoodItem = foodItemDAO.getFoodItemById(foodItem.getFoodItemId());
             foodItems.add(detailedFoodItem);
         }
+        return foodItems;
+    }
 
+    private Map<Long, FoodItemType> getFoodItemTypeMap() {
+        FoodItemTypeDAO foodItemTypeDAO = new FoodItemTypeDAO();
         List<FoodItemType> foodItemTypes = foodItemTypeDAO.getAllFoodItemTypes();
+
         Map<Long, FoodItemType> foodItemTypeMap = new HashMap<>();
         for (FoodItemType type : foodItemTypes) {
             foodItemTypeMap.put(type.getFoodItemTypeId(), type);
         }
+        return foodItemTypeMap;
+    }
 
-        EmployeeProfile employeeProfile = employeeProfileDAO.getEmployeeProfile(userId);
-        String dietaryPreference = employeeProfile.getDietaryPreference();
-        String spiceLevel = employeeProfile.getSpiceLevel();
-        String cuisinePreference = employeeProfile.getCuisinePreference();
-        String sweetTooth = employeeProfile.getSweetTooth();
+    private EmployeeProfile getEmployeeProfile(Long userId) {
+        EmployeeProfileDAO employeeProfileDAO = new EmployeeProfileDAO();
+        return employeeProfileDAO.getEmployeeProfile(userId);
+    }
 
-        foodItems = foodItems.stream()
+    private List<FoodItem> sortFoodItemsByPreferences(List<FoodItem> foodItems, Map<Long, FoodItemType> foodItemTypeMap, EmployeeProfile profile) {
+        return foodItems.stream()
                 .sorted(Comparator.comparing((FoodItem item) -> {
                     FoodItemType foodItemType = foodItemTypeMap.get(item.getFoodItemTypeId());
                     return foodItemType != null ? foodItemType.getFoodItemType() : "";
-                }).thenComparing(item -> {
-                    int preferenceScore = 0;
-                    if (item.getDietaryPreference().equalsIgnoreCase(dietaryPreference)) {
-                        preferenceScore -= 4;
-                    }
-                    if (item.getSpiceLevel().equalsIgnoreCase(spiceLevel)) {
-                        preferenceScore -= 3;
-                    }
-                    if (item.getCuisinePreference().equalsIgnoreCase(cuisinePreference)) {
-                        preferenceScore -= 2;
-                    }
-                    if (item.getSweetTooth().equalsIgnoreCase(sweetTooth)) {
-                        preferenceScore -= 1;
-                    }
-                    return preferenceScore;
-                }))
+                }).thenComparing(item -> calculatePreferenceScore(item, profile)))
                 .collect(Collectors.toList());
+    }
 
+    private int calculatePreferenceScore(FoodItem item, EmployeeProfile profile) {
+        int preferenceScore = 0;
+        if (item.getDietaryPreference().equalsIgnoreCase(profile.getDietaryPreference())) {
+            preferenceScore -= 4;
+        }
+        if (item.getSpiceLevel().equalsIgnoreCase(profile.getSpiceLevel())) {
+            preferenceScore -= 3;
+        }
+        if (item.getCuisinePreference().equalsIgnoreCase(profile.getCuisinePreference())) {
+            preferenceScore -= 2;
+        }
+        if (item.getSweetTooth().equalsIgnoreCase(profile.getSweetTooth())) {
+            preferenceScore -= 1;
+        }
+        return preferenceScore;
+    }
+
+    private String generateMenuString(List<FoodItem> foodItems, Map<Long, FoodItemType> foodItemTypeMap) {
         StringBuilder menuString = new StringBuilder();
         menuString.append(String.format("%-10s %-20s %-10s %-10s %-20s %-15s %-30s\n",
                 "ID", "Name", "Price", "Available", "Type", "Avg Rating", "Sentiment Comment"));
